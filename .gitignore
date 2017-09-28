@@ -23,3 +23,11 @@ hs_err_pid*
 
 .idea
 kliander.iml
+
+_linux
+codestyles
+colors.scheme.xml
+debugger.xml
+editor.xml
+filetypes.xml
+ui.lnf.xml
