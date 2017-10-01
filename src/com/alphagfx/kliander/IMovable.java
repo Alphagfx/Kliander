@@ -1,3 +1,5 @@
+//  Copyright Kliander Alphagfx
+
 package com.alphagfx.kliander;
 
 public interface IMovable {
