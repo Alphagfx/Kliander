@@ -21,11 +21,13 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-.idea
+.idea/
 kliander.iml
 
-_linux
-codestyles
+_linux/
+codestyles/
+out/
+
 colors.scheme.xml
 debugger.xml
 editor.xml
