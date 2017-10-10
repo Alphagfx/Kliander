@@ -2,6 +2,8 @@ package com.alphagfx.kliander.stages;
 
 import com.alphagfx.kliander.utils.WorldUtils;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -23,9 +25,12 @@ public class GameStage extends Stage {
     private final static float TIME_STEP = 1 / 300f;
     private float accumulator = 0;
 
+    private Body subj;
+
     public GameStage() {
         world = WorldUtils.createWorld();
         debugRenderer = new Box2DDebugRenderer();
+        subj = WorldUtils.createSubj(world, new Vector2(5, 5));
         setupCamera();
     }
 

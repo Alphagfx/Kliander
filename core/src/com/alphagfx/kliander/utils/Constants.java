@@ -10,4 +10,6 @@ public class Constants {
     public final static float DEFAULT_y = 0;
 
     public final static Vector2 WORLD_GRAVITY = new Vector2(0, 0);
+
+
 }
