@@ -1,5 +1,6 @@
 package com.alphagfx.kliander.utils;
 
+import com.alphagfx.kliander.box2d.CreatureUserData;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -23,8 +24,11 @@ public class WorldUtils {
         Body body = world.createBody(bodyDef);
         body.createFixture(shape, 0.5f);
         body.resetMassData();
+        body.setUserData(new CreatureUserData());
         shape.dispose();
         return body;
     }
+
+//    public static Body createObstacle(World world, Vector2 vector) { }
 
 }

@@ -12,19 +12,33 @@
 //        See the License for the specific language governing permissions and
 //        limitations under the License.
 
-package com.alphagfx.kliander;
+package com.alphagfx.kliander.actors;
 
-public class Creature extends Subject implements IMovable {
+import com.alphagfx.kliander.box2d.CreatureUserData;
+import com.alphagfx.kliander.box2d.UserData;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 
-    public void run() {
-        System.out.println(this.getHealth());
-        this.setHealth(50);
-        System.out.println(getHealth());
+public class Creature extends GameActor {
+
+    private boolean dashing;
+
+    public Creature(Body body) {
+        super(body);
     }
 
     @Override
-    public void move() {
-
+    public UserData getUserData() {
+        return (CreatureUserData) userData;
     }
 
+    public void dash() {
+//        if (!dashing) {
+        body.applyLinearImpulse(new Vector2(0, 10f), body.getWorldCenter(), true);
+//        }
+    }
+
+    public void noDash() {
+        dashing = false;
+    }
 }
