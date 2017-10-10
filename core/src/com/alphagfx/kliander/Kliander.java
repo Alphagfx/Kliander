@@ -2,14 +2,21 @@ package com.alphagfx.kliander;
 
 import com.alphagfx.kliander.screens.GameScreen;
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.physics.box2d.Box2D;
+
 
 public class Kliander extends Game {
 
 	@Override
 	public void create () {
-        setScreen(new GameScreen());
+        // have been told to use box2d.init (preferred)
+        Box2D.init();
 
+        setScreen(new GameScreen());
     }
 
-
+    @Override
+    public void render() {
+        super.render();
+    }
 }
