@@ -14,11 +14,27 @@
 
 package com.alphagfx.kliander;
 
+import com.alphagfx.kliander.utils.Constants;
+import com.badlogic.gdx.physics.box2d.Shape;
+
 public abstract class Subject {
     private float health;
     private float position_x;
     private float position_y;
-    private Object form;
+    private Shape shape;
+
+    Subject() {
+        setHealth(100);
+        setPosition_x(Constants.DEFAULT_X);
+        setPosition_y(Constants.DEFAULT_y);
+    }
+
+    Subject(float health, float position_x, float position_y, Shape shape) {
+        setHealth(health);
+        setPosition_x(position_x);
+        setPosition_y(position_y);
+        setShape(shape);
+    }
 
     public float getHealth() {
         return health;
@@ -44,11 +60,11 @@ public abstract class Subject {
         this.position_y = position_y;
     }
 
-    public Object getForm() {
-        return form;
+    public Shape getShape() {
+        return shape;
     }
 
-    public void setForm(Object form) {
-        this.form = form;
+    public void setShape(Shape shape) {
+        this.shape = shape;
     }
 }

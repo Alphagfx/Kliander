@@ -27,8 +27,4 @@ public class Creature extends Subject implements IMovable {
 
     }
 
-    public static void main(String[] args) {
-        Creature c = new Creature();
-        c.run();
-    }
 }
