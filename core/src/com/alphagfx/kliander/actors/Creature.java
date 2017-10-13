@@ -34,11 +34,24 @@ public class Creature extends GameActor {
 
     public void dash() {
 //        if (!dashing) {
-        body.applyLinearImpulse(new Vector2(0, 10f), body.getWorldCenter(), true);
+        body.applyLinearImpulse(new Vector2(5, 0), body.getWorldCenter(), true);
 //        }
+    }
+
+    public void stop() {
+        body.setLinearVelocity(0, 0);
     }
 
     public void noDash() {
         dashing = false;
+    }
+
+    @Override
+    public void setPosition(float x, float y) {
+        super.setPosition(x, y);
+    }
+
+    public Vector2 getPostition() {
+        return body.getPosition();
     }
 }

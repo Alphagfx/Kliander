@@ -1,0 +1,5 @@
+GameStage.java implements ContactListener (controls)
+Clear Creature and GameStage
+Delete Subject
+Reimplement Obstacle
+?(Serializable)
