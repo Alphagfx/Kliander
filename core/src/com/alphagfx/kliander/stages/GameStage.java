@@ -2,11 +2,13 @@ package com.alphagfx.kliander.stages;
 
 import com.alphagfx.kliander.actors.Creature;
 import com.alphagfx.kliander.utils.CameraHandle;
+import com.alphagfx.kliander.utils.Constants;
 import com.alphagfx.kliander.utils.WorldUtils;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -25,6 +27,8 @@ public class GameStage extends Stage {
     private float accumulator = 0;
 
     private Creature creature;
+    private Body worldBorder;
+    private Body obstacle;
 
     public GameStage() {
         world = WorldUtils.createWorld();
@@ -33,6 +37,11 @@ public class GameStage extends Stage {
         camera.create();
         addCreature();
         setupTouchControlAreas();
+
+        worldBorder = WorldUtils.createWorldBorders(world, new Vector2(1, 1),
+                new Vector2(Constants.WORLD_WIDTH - 1, Constants.WORLD_HEIGHT - 1));
+
+        obstacle = WorldUtils.createObsatcle(world, new Vector2(15, 5));
     }
 
 
@@ -95,5 +104,9 @@ public class GameStage extends Stage {
     public void draw() {
         super.draw();
         debugRenderer.render(world, camera.getMatrixCombined());
+    }
+
+    public void resize(int width, int height) {
+        camera.resize(width, height);
     }
 }

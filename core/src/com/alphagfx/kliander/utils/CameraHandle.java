@@ -39,22 +39,22 @@ public class CameraHandle implements ApplicationListener {
 
     private void handleInput() {
         if (Gdx.input.isKeyPressed(Input.Keys.NUM_9)) {
-            camera.zoom += 0.02;
+            camera.zoom += 0.01;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.NUM_0)) {
-            camera.zoom -= 0.02;
+            camera.zoom -= 0.01;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            camera.translate(0, 3);
+            camera.translate(0, 1);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            camera.translate(0, -3);
+            camera.translate(0, -1);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            camera.translate(-3, 0);
+            camera.translate(-1, 0);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            camera.translate(3, 0);
+            camera.translate(1, 0);
         }
 
         camera.zoom = MathUtils.clamp(camera.zoom, 0.1f, 100 / camera.viewportWidth);
@@ -67,10 +67,15 @@ public class CameraHandle implements ApplicationListener {
 
     }
 
+    //    Temporary quick-fix
     @Override
     public void resize(int width, int height) {
+
+        int a = Gdx.graphics.getWidth();
+        int b = Gdx.graphics.getHeight();
+
         camera.viewportWidth = 30f;
-        camera.viewportHeight = 30f * height / width;
+        camera.viewportHeight = 30f * b / a;
         camera.update();
     }
 

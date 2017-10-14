@@ -14,6 +14,14 @@
 
 package com.alphagfx.kliander;
 
+public class Obstacle {
+
+}
+
+/*
+
+package com.alphagfx.kliander;
+
 public class Obstacle extends Subject {
     // transparency 100 is the same as air and 0 for solid blocks
     private int transparency;
@@ -45,3 +53,4 @@ public class Obstacle extends Subject {
         }
     }
 }
+*/
