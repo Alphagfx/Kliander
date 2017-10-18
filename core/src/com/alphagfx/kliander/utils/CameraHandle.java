@@ -6,6 +6,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector2;
 
 public class CameraHandle implements ApplicationListener {
 
@@ -13,10 +14,18 @@ public class CameraHandle implements ApplicationListener {
 
     private float rotationSpeed;
 
+    public Vector2 translateToWorld(int screenX, int screenY) {
+        Vector2 vector2 = new Vector2();
+        vector2.x = (float) screenX / Gdx.graphics.getWidth() * (camera.position.x * 2);
+        vector2.y = (1 - (float) screenY / Gdx.graphics.getHeight()) * (camera.position.y * 2);
+        return vector2;
+    }
+
     //    debugRender Matrix requirement
     public Matrix4 getMatrixCombined() {
         return camera.combined;
     }
+
 
     @Override
     public void create() {

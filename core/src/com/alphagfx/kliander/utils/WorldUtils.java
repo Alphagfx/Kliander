@@ -23,7 +23,7 @@ public class WorldUtils {
         Body body = world.createBody(bodyDef);
         body.createFixture(shape, 0.5f);
         body.resetMassData();
-        body.setUserData(new CreatureUserData());
+        body.setUserData(new CreatureUserData(2));
 
         shape.dispose();
 
@@ -68,6 +68,10 @@ public class WorldUtils {
         shape.dispose();
 
         return body;
+    }
+
+    public static boolean containsInCircle(Vector2 touch, Vector2 body, int r) {
+        return ((touch.x - body.x) * (touch.x - body.x) + (touch.y - body.y) * (touch.y - body.y)) < (r * r);
     }
 
 }

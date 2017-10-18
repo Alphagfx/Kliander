@@ -5,9 +5,9 @@ import com.alphagfx.kliander.utils.CameraHandle;
 import com.alphagfx.kliander.utils.Constants;
 import com.alphagfx.kliander.utils.WorldUtils;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
@@ -27,6 +27,8 @@ public class GameStage extends Stage {
     private float accumulator = 0;
 
     private Creature creature;
+    private Creature selectedCreature;
+
     private Body worldBorder;
     private Body obstacle;
 
@@ -53,13 +55,16 @@ public class GameStage extends Stage {
 
     //  Controls
 
-    private Vector3 touchPoint;
+    private Vector2 touchPoint;
     private Rectangle screenRightSide;
+    private Batch batch;
 
     private void setupTouchControlAreas() {
-        touchPoint = new Vector3();
+        touchPoint = new Vector2();
         screenRightSide = new Rectangle(getCamera().viewportWidth / 2, 0, getCamera().viewportWidth / 2,
                 getCamera().viewportHeight / 2);
+//        batch = new SpriteBatch();
+//        batch.draw();
         Gdx.input.setInputProcessor(this);
 
     }
@@ -67,10 +72,23 @@ public class GameStage extends Stage {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         translateScreenToWorldCoordinates(screenX, screenY);
-        if (rightSideTouched(touchPoint.x, touchPoint.y)) {
-            creature.dash();
+        if (rightSideTouched(touchPoint.x, touchPoint.y) && selectedCreature != null) {
+            selectedCreature.dash();
+        } else if (WorldUtils.containsInCircle(touchPoint, creature.getPosition(), creature.getUserData().getSelectRange())) {
+            System.out.println(touchPoint + " : " + creature.getPosition() + " : " + creature.getUserData().getSelectRange() + " : selected");
+            selectedCreature = creature;
+        } else if (selectedCreature != null) {
+            selectedCreature.moveTo(camera.translateToWorld(screenX, screenY));
         }
         return super.touchDown(screenX, screenY, pointer, button);
+    }
+
+    @Override
+    public boolean keyDown(int keyCode) {
+//        if (keyCode == 'a' && creature != null ) {
+//             creature.dash();
+//        }
+        return super.keyDown(keyCode);
     }
 
     private boolean rightSideTouched(float x, float y) {
@@ -78,9 +96,8 @@ public class GameStage extends Stage {
     }
 
     private void translateScreenToWorldCoordinates(int x, int y) {
-        getCamera().unproject(touchPoint.set(x, y, 0));
+        touchPoint = camera.translateToWorld(x, y);
     }
-
 
     //  Main process loop
 

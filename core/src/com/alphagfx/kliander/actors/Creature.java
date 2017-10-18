@@ -51,7 +51,13 @@ public class Creature extends GameActor {
         super.setPosition(x, y);
     }
 
-    public Vector2 getPostition() {
+    public Vector2 getPosition() {
         return body.getPosition();
+    }
+
+    public void moveTo(Vector2 vector2) {
+
+        body.applyLinearImpulse(new Vector2(vector2.sub(getPosition())), body.getWorldCenter(), true);
+
     }
 }
