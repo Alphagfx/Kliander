@@ -7,13 +7,15 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 public class CameraHandle implements ApplicationListener {
 
     private OrthographicCamera camera;
-
+    private ExtendViewport viewport;
     private float rotationSpeed;
 
+    //    Probably should use camera.unproject but there is smth mad happening
     public Vector2 translateToWorld(int screenX, int screenY) {
         Vector2 vector2 = new Vector2();
         vector2.x = (float) screenX / Gdx.graphics.getWidth() * (camera.position.x * 2);
@@ -29,12 +31,14 @@ public class CameraHandle implements ApplicationListener {
 
     @Override
     public void create() {
-        rotationSpeed = 0.5f;
+//        rotationSpeed = 0.5f;
 
-        float w = Gdx.graphics.getWidth();
-        float h = Gdx.graphics.getHeight();
+        int w = Gdx.graphics.getWidth();
+        int h = Gdx.graphics.getHeight();
 
-        camera = new OrthographicCamera(30, 30 * (h / w));
+        camera = new OrthographicCamera(30, 30 * (float) (h / w));
+        viewport = new ExtendViewport(200, 120, 800, 480, camera);
+        viewport.update(w, h);
 
         camera.position.set(camera.viewportWidth / 2f, camera.viewportHeight / 2f, 0);
         camera.update();
@@ -42,11 +46,16 @@ public class CameraHandle implements ApplicationListener {
 
     @Override
     public void render() {
-        handleInput();
         camera.update();
     }
 
-    private void handleInput() {
+    public void scrollZoom(int i) {
+        camera.zoom += 0.01 * i;
+        camera.zoom = MathUtils.clamp(camera.zoom, 0.1f, 100 / camera.viewportWidth);
+        camera.update();
+    }
+
+    public void handleInput() {
         if (Gdx.input.isKeyPressed(Input.Keys.NUM_9)) {
             camera.zoom += 0.01;
         }
@@ -73,19 +82,19 @@ public class CameraHandle implements ApplicationListener {
 
         camera.position.x = MathUtils.clamp(camera.position.x, effectiveViewportWidth / 2f, 100 - effectiveViewportWidth / 2f);
         camera.position.y = MathUtils.clamp(camera.position.y, effectiveViewportHeight / 2f, 100 - effectiveViewportHeight / 2f);
-
     }
 
     //    Temporary quick-fix
     @Override
     public void resize(int width, int height) {
-
+/*
         int a = Gdx.graphics.getWidth();
         int b = Gdx.graphics.getHeight();
 
         camera.viewportWidth = 30f;
         camera.viewportHeight = 30f * b / a;
-        camera.update();
+        camera.update();*/
+        viewport.update(width, height);
     }
 
     @Override

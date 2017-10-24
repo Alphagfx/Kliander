@@ -1,5 +1,15 @@
 GameStage.java implements ContactListener (controls)
 Clear Creature and GameStage
-Delete Subject
 Reimplement Obstacle
+Controls fix (add proper mouse support for zoom and movement through the screen)
+
+Camera and Viewport
+Camera handleInput replace with event handle
+
+InputMultiplexer ?
+
 ?(Serializable)
+
+https://github.com/libgdx/libgdx/blob/master/tests/gdx-tests/src/com/badlogic/gdx/tests/Box2DTest.java
+World.QueryAABB
+Fixture select

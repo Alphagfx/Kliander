@@ -18,6 +18,8 @@ public class GameScreen implements Screen {
         //  Clear the screen
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        Gdx.input.setInputProcessor(gameStage);
+
         gameStage.draw();
         gameStage.act(delta);
     }

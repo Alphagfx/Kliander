@@ -5,6 +5,7 @@ import com.alphagfx.kliander.utils.CameraHandle;
 import com.alphagfx.kliander.utils.Constants;
 import com.alphagfx.kliander.utils.WorldUtils;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -33,25 +34,37 @@ public class GameStage extends Stage {
     private Body obstacle;
 
     public GameStage() {
+
         world = WorldUtils.createWorld();
+
         debugRenderer = new Box2DDebugRenderer();
+
         camera = new CameraHandle();
         camera.create();
-        addCreature();
+
         setupTouchControlAreas();
 
         worldBorder = WorldUtils.createWorldBorders(world, new Vector2(1, 1),
                 new Vector2(Constants.WORLD_WIDTH - 1, Constants.WORLD_HEIGHT - 1));
 
         obstacle = WorldUtils.createObsatcle(world, new Vector2(15, 5));
+
+        System.out.println(getRoot().getStage() == null);
+
+        for (int i = 0; i < 10; i++) {
+            addCreature();
+        }
     }
 
 
     public void addCreature() {
-        creature = new Creature(WorldUtils.createSubj(world, new Vector2(5, 5)));
-        addActor(creature);
+        Creature newbie = new Creature(WorldUtils.createSubj(world, new Vector2((float) Math.random() * 100, (float) Math.random() * 100)));
+        addActor(newbie);
     }
 
+    public void setSelectedCreature(Creature selectedCreature) {
+        this.selectedCreature = selectedCreature;
+    }
 
     //  Controls
 
@@ -63,32 +76,47 @@ public class GameStage extends Stage {
         touchPoint = new Vector2();
         screenRightSide = new Rectangle(getCamera().viewportWidth / 2, 0, getCamera().viewportWidth / 2,
                 getCamera().viewportHeight / 2);
-//        batch = new SpriteBatch();
-//        batch.draw();
+
         Gdx.input.setInputProcessor(this);
 
     }
 
     @Override
+    public boolean scrolled(int amount) {
+        camera.scrollZoom(amount);
+        return super.scrolled(amount);
+    }
+
+    @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         translateScreenToWorldCoordinates(screenX, screenY);
-        if (rightSideTouched(touchPoint.x, touchPoint.y) && selectedCreature != null) {
-            selectedCreature.dash();
-        } else if (WorldUtils.containsInCircle(touchPoint, creature.getPosition(), creature.getUserData().getSelectRange())) {
+
+       /* if (Gdx.input.isButtonPressed(Input.Buttons.LEFT) && WorldUtils.containsInCircle(touchPoint, creature.getPosition(), creature.getUserData().getSelectRange())) {
             System.out.println(touchPoint + " : " + creature.getPosition() + " : " + creature.getUserData().getSelectRange() + " : selected");
             selectedCreature = creature;
-        } else if (selectedCreature != null) {
-            selectedCreature.moveTo(camera.translateToWorld(screenX, screenY));
+        }*/
+//        for (Actor actor : this.getActors()) {
+//            System.out.println("hit");
+//            selectedCreature = (Creature)actor.hit(touchPoint.x, touchPoint.y, true);
+//        }
+        if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
+            if (selectedCreature != null) {
+                selectedCreature.moveTo(camera.translateToWorld(screenX, screenY));
+            }
         }
         return super.touchDown(screenX, screenY, pointer, button);
     }
 
     @Override
     public boolean keyDown(int keyCode) {
-//        if (keyCode == 'a' && creature != null ) {
-//             creature.dash();
-//        }
         return super.keyDown(keyCode);
+    }
+
+    @Override
+    public boolean keyTyped(char character) {
+        camera.handleInput();
+
+        return super.keyTyped(character);
     }
 
     private boolean rightSideTouched(float x, float y) {
@@ -97,6 +125,10 @@ public class GameStage extends Stage {
 
     private void translateScreenToWorldCoordinates(int x, int y) {
         touchPoint = camera.translateToWorld(x, y);
+
+//          Smth is wrong and this does not work
+//        System.out.println(screenToStageCoordinates(new Vector2(x, y)));
+//        Gdx.input.isKeyPressed(Input.Keys.)
     }
 
     //  Main process loop

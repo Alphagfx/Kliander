@@ -70,6 +70,8 @@ public class WorldUtils {
         return body;
     }
 
+    //    Basic Circle contains, used instead of a Shape2D
+//    Preferred to use Body Fixtures
     public static boolean containsInCircle(Vector2 touch, Vector2 body, int r) {
         return ((touch.x - body.x) * (touch.x - body.x) + (touch.y - body.y) * (touch.y - body.y)) < (r * r);
     }
