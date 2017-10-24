@@ -19,7 +19,6 @@ import com.alphagfx.kliander.box2d.UserData;
 import com.alphagfx.kliander.stages.GameStage;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -29,7 +28,6 @@ public class Creature extends GameActor {
 
     private float max_speed = 20;
     private Vector2 waypoint;
-    Batch batch;
 
     public Creature(Body body) {
         super(body);
@@ -38,8 +36,6 @@ public class Creature extends GameActor {
         setColor(Color.CYAN);
 
         setDebug(true);
-
-//        draw(new PolygonSpriteBatch(), 5);
 
         this.addListener(new ClickListener(Input.Buttons.LEFT) {
             @Override
@@ -58,6 +54,11 @@ public class Creature extends GameActor {
     @Override
     public UserData getUserData() {
         return (CreatureUserData) userData;
+    }
+
+    @Override
+    public UserData setUserData() {
+        return userData;
     }
 
     public void stop() {

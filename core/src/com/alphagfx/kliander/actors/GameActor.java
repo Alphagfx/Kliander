@@ -15,4 +15,6 @@ public abstract class GameActor extends Actor {
     }
 
     public abstract UserData getUserData();
+
+    public abstract UserData setUserData();
 }

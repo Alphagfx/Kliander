@@ -28,4 +28,8 @@ public class Obstacle extends GameActor {
         return null;
     }
 
+    @Override
+    public UserData setUserData() {
+        return null;
+    }
 }
