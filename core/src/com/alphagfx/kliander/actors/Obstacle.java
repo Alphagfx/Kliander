@@ -29,7 +29,7 @@ public class Obstacle extends GameActor {
     }
 
     @Override
-    public UserData setUserData() {
-        return null;
+    public void setUserData(Object object) {
+        this.userData = (UserData) object;
     }
 }

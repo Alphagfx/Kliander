@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
 public class GameStage extends Stage {
@@ -20,6 +21,7 @@ public class GameStage extends Stage {
     private Box2DDebugRenderer debugRenderer;
 
     private CameraHandle camera;
+    private boolean camera_read;
 
     //  Time management
     private final static float TIME_STEP = 1 / 300f;
@@ -39,14 +41,14 @@ public class GameStage extends Stage {
         camera = new CameraHandle();
         camera.create();
 
+        setViewport(camera.getViewport());
+
         worldBorder = WorldUtils.createWorldBorders(world, new Vector2(1, 1),
                 new Vector2(Constants.WORLD_WIDTH - 1, Constants.WORLD_HEIGHT - 1));
 
         obstacle = WorldUtils.createObsatcle(world, new Vector2(15, 5));
 
-        System.out.println(getRoot().getStage() == null);
-
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 5; i++) {
             addCreature();
         }
     }
@@ -65,31 +67,53 @@ public class GameStage extends Stage {
 
     @Override
     public boolean scrolled(int amount) {
+
         camera.scrollZoom(amount);
+
         return super.scrolled(amount);
     }
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+//        Gdx.app.log("touchpoint", camera.translateToWorld(screenX, screenY).toString());
+
         if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
             if (selectedCreature != null) {
+//                selectedCreature.moveTo(camera.translateToWorld(screenX, screenY), MathUtils.random(MathUtils.PI2));
                 selectedCreature.moveTo(camera.translateToWorld(screenX, screenY));
+//                keyDown(Input.Keys.C);
             }
         }
+
         return super.touchDown(screenX, screenY, pointer, button);
     }
 
     @Override
     public boolean keyDown(int keyCode) {
-        camera.handleInput();
+
+        camera_read = true;
+
+        if (keyCode == Input.Keys.Z) {
+            for (Actor actor : getActors()) {
+                if (actor.getClass() == Creature.class) {
+                    ((Creature) actor).getActorPosition();
+                }
+            }
+        }
+
+        if (keyCode == Input.Keys.C) {
+            selectedCreature.getActorPosition();
+        }
+
         return super.keyDown(keyCode);
     }
 
     @Override
-    public boolean keyTyped(char character) {
-        camera.handleInput();
+    public boolean keyUp(int keyCode) {
 
-        return super.keyTyped(character);
+        camera_read = false;
+
+        return super.keyUp(keyCode);
     }
 
     //  Main process loop
@@ -98,6 +122,9 @@ public class GameStage extends Stage {
     public void act(float delta) {
         super.act(delta);
 
+        if (camera_read) {
+            camera.handleInput();
+        }
         camera.render();
 
         //  fixed time step

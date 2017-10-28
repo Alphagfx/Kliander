@@ -17,8 +17,9 @@ package com.alphagfx.kliander.actors;
 import com.alphagfx.kliander.box2d.CreatureUserData;
 import com.alphagfx.kliander.box2d.UserData;
 import com.alphagfx.kliander.stages.GameStage;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -27,14 +28,16 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 public class Creature extends GameActor {
 
     private float max_speed = 20;
+    private float turn_speed = 5;
+
     private Vector2 waypoint;
+    private float waypoint_angle;
 
     public Creature(Body body) {
         super(body);
-        setPosition(body.getPosition().x, body.getPosition().y);
-        setSize(1, 1);
-        setColor(Color.CYAN);
 
+        setSize(2, 2);
+//        debug
         setDebug(true);
 
         this.addListener(new ClickListener(Input.Buttons.LEFT) {
@@ -45,8 +48,6 @@ public class Creature extends GameActor {
                 super.clicked(event, x, y);
             }
         });
-
-        System.out.println(getX() + " " + getY() + " " + getWidth() + " " + getHeight());
     }
 
 
@@ -57,8 +58,8 @@ public class Creature extends GameActor {
     }
 
     @Override
-    public UserData setUserData() {
-        return userData;
+    public void setUserData(Object object) {
+        this.userData = (CreatureUserData) object;
     }
 
     public void stop() {
@@ -75,22 +76,48 @@ public class Creature extends GameActor {
     }
 
     public void moveTo(Vector2 vector2) {
+        moveTo(vector2, body.getAngle());
+    }
+
+    public void moveTo(Vector2 vector2, float angle) {
         waypoint = vector2;
+        waypoint_angle = angle;
+        float body_angle = ((body.getAngle() % MathUtils.PI2 + MathUtils.PI2)) % MathUtils.PI2;
         Vector2 speed = vector2.cpy();
         speed.sub(this.body.getPosition());
 
-        body.setAngularVelocity(0);
         body.setLinearVelocity(speed.nor().scl(max_speed));
+
+//        Angular velocity
+        if (Math.abs(waypoint_angle - body_angle) > 0.01) {
+            body.setAngularVelocity((((waypoint_angle - body_angle) + MathUtils.PI2) % MathUtils.PI2 > MathUtils.PI) ? -turn_speed : turn_speed);
+//            System.out.println("speedup");
+//            System.out.println("angular " + body.getAngularVelocity());
+        }
+
     }
 
+    public void getActorPosition() {
+//        Vector2 position = Creature.this.getStage().stageToScreenCoordinates(body.getPosition());
+//        Gdx.app.log("Screen position", position.toString());
+        Gdx.app.log("angle", "" + waypoint_angle);
+        Gdx.app.log("body angle", "" + ((body.getAngle() % MathUtils.PI2 + MathUtils.PI2)) % MathUtils.PI2);
+
+    }
 
     @Override
     public void act(float delta) {
-        setPosition(body.getPosition().x, body.getPosition().y);
-        setSize(10, 10);
 
-        if (body.getPosition().epsilonEquals(waypoint, 0.05f)) {
-            stop();
+        if (body.isAwake()) {
+
+            setPosition(body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2);
+
+            if (body.getPosition().epsilonEquals(waypoint, 0.05f)) {
+                stop();
+            }
+            if (Math.abs(waypoint_angle - ((body.getAngle() % MathUtils.PI2 + MathUtils.PI2)) % MathUtils.PI2) <= 0.01) {
+                body.setAngularVelocity(0);
+            }
         }
     }
 }

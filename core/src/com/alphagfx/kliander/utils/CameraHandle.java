@@ -35,6 +35,9 @@ public class CameraHandle implements ApplicationListener {
         return camera.combined;
     }
 
+    public ExtendViewport getViewport() {
+        return viewport;
+    }
 
     @Override
     public void create() {
@@ -44,23 +47,25 @@ public class CameraHandle implements ApplicationListener {
         int h = Gdx.graphics.getHeight();
 
         camera = new OrthographicCamera(30, (float) w / h * 30);
-//        viewport = new ExtendViewport(200, 120, 800, 480, camera);
-//        viewport.update(w, h);
+        viewport = new ExtendViewport(20, 20, camera);
+        viewport.update(w, h);
 
         camera.position.set(camera.viewportWidth / 2f, camera.viewportHeight / 2f, 0);
+        camera.zoom = 3.3f;
         handleInput();
-        camera.update();
+//        camera.update();
     }
 
     @Override
     public void render() {
-        camera.update();
+//        camera.update();
+        viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
 
     public void scrollZoom(int i) {
         camera.zoom += 0.01 * i;
         handleInput();
-        camera.update();
+        render();
     }
 
     public void handleInput() {
@@ -103,7 +108,8 @@ public class CameraHandle implements ApplicationListener {
 
         camera.viewportWidth = 30f;
         camera.viewportHeight = 30f * b / a;
-        camera.update();
+//        camera.update();
+        render();
 //        viewport.update(width, height);
     }
 
