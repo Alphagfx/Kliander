@@ -1,0 +1,30 @@
+TODO:
+
+Game Turns
+
+new Creature child
+
+GameStage.java implements ContactListener (controls)
+
+Reimplement Obstacle
+
+~Camera and Viewport
+~Camera handleInput replace with event handle
+
+InputMultiplexer ?
+
+?(Serializable)
+
+multiple creature select
+
+https://github.com/libgdx/libgdx/blob/master/tests/gdx-tests/src/com/badlogic/gdx/tests/Box2DTest.java
+World.QueryAABB
+Fixture select
+
+Completed:
+Clear Creature and GameStage
+Controls fix (add proper mouse support for zoom)
+Controls fix (movement through the screen)
+
+Creature Actor position and rotation fix (diff math)
+

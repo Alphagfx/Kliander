@@ -12,9 +12,24 @@
 //        See the License for the specific language governing permissions and
 //        limitations under the License.
 
-package com.alphagfx.kliander;
+package com.alphagfx.kliander.actors;
 
-public interface IMovable {
-    float max_speed = 0;
-    void move();
+import com.alphagfx.kliander.box2d.UserData;
+import com.badlogic.gdx.physics.box2d.Body;
+
+public class Obstacle extends GameActor {
+
+    public Obstacle(Body body) {
+        super(body);
+    }
+
+    @Override
+    public UserData getUserData() {
+        return null;
+    }
+
+    @Override
+    public void setUserData(Object object) {
+        this.userData = (UserData) object;
+    }
 }
