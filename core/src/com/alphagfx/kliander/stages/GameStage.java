@@ -1,11 +1,13 @@
 package com.alphagfx.kliander.stages;
 
 import com.alphagfx.kliander.actors.Creature;
+import com.alphagfx.kliander.actors.Fighter;
 import com.alphagfx.kliander.utils.CameraHandle;
 import com.alphagfx.kliander.utils.Constants;
 import com.alphagfx.kliander.utils.WorldUtils;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -24,7 +26,7 @@ public class GameStage extends Stage {
     private boolean camera_read;
 
     //  Time management
-    private final static float TIME_STEP = 1 / 300f;
+    private final static float TIME_STEP = 1 / 200f;
     private float accumulator = 0;
 
     private Creature selectedCreature;
@@ -55,7 +57,9 @@ public class GameStage extends Stage {
 
 
     public void addCreature() {
-        Creature newbie = new Creature(WorldUtils.createSubj(world, new Vector2((float) Math.random() * 90 + 5, (float) Math.random() * 90 + 5)));
+//        Creature newbie = new Creature(WorldUtils.createSubj(world, new Vector2((float) Math.random() * 90 + 5, (float) Math.random() * 90 + 5)));
+        Fighter newbie = new Fighter(WorldUtils.createSubj(world, new Vector2((float) Math.random() * 90 + 5, (float) Math.random() * 90 + 5)));
+
         addActor(newbie);
     }
 
@@ -76,11 +80,19 @@ public class GameStage extends Stage {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 //        Gdx.app.log("touchpoint", camera.translateToWorld(screenX, screenY).toString());
+        if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
+            if (selectedCreature != null) {
+                // FIXME: 11/1/17 angles
+                Vector2 vector2 = camera.translateToWorld(screenX, screenY).sub(selectedCreature.getPosition()).nor();
+                selectedCreature.moveTo(selectedCreature.getPosition(), MathUtils.atan2(vector2.y, vector2.x) + MathUtils.PI2);
+                ((Fighter) selectedCreature).fire();
+            }
+        }
 
         if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
             if (selectedCreature != null) {
-//                selectedCreature.moveTo(camera.translateToWorld(screenX, screenY), MathUtils.random(MathUtils.PI2));
-                selectedCreature.moveTo(camera.translateToWorld(screenX, screenY));
+                selectedCreature.moveTo(camera.translateToWorld(screenX, screenY), MathUtils.random(MathUtils.PI2));
+//                selectedCreature.moveTo(camera.translateToWorld(screenX, screenY));
 //                keyDown(Input.Keys.C);
             }
         }
