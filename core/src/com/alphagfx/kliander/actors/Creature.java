@@ -17,6 +17,7 @@ package com.alphagfx.kliander.actors;
 import com.alphagfx.kliander.box2d.CreatureUserData;
 import com.alphagfx.kliander.box2d.UserData;
 import com.alphagfx.kliander.stages.GameStage;
+import com.alphagfx.kliander.utils.WorldUtils;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.MathUtils;
@@ -50,6 +51,10 @@ public class Creature extends GameActor {
         });
     }
 
+    public Body getBody() {
+        return body;
+    }
+
 
 
     @Override
@@ -75,21 +80,22 @@ public class Creature extends GameActor {
         return body.getPosition();
     }
 
+    // FIXME: 10/31/17 angle
     public void moveTo(Vector2 vector2) {
-        moveTo(vector2, body.getAngle());
+        moveTo(vector2, WorldUtils.transformAngle(body.getAngle()));
     }
 
     public void moveTo(Vector2 vector2, float angle) {
         waypoint = vector2;
-        waypoint_angle = angle;
-        float body_angle = ((body.getAngle() % MathUtils.PI2 + MathUtils.PI2)) % MathUtils.PI2;
+        waypoint_angle = WorldUtils.transformAngle(angle);
+        float body_angle = WorldUtils.transformAngle(body.getAngle());
         Vector2 speed = vector2.cpy();
         speed.sub(this.body.getPosition());
 
         body.setLinearVelocity(speed.nor().scl(max_speed));
 
 //        Angular velocity
-        if (Math.abs(waypoint_angle - body_angle) > 0.01) {
+        if (Math.abs(waypoint_angle - body_angle) > 0.05) {
             body.setAngularVelocity((((waypoint_angle - body_angle) + MathUtils.PI2) % MathUtils.PI2 > MathUtils.PI) ? -turn_speed : turn_speed);
 //            System.out.println("speedup");
 //            System.out.println("angular " + body.getAngularVelocity());
@@ -102,6 +108,7 @@ public class Creature extends GameActor {
 //        Gdx.app.log("Screen position", position.toString());
         Gdx.app.log("angle", "" + waypoint_angle);
         Gdx.app.log("body angle", "" + ((body.getAngle() % MathUtils.PI2 + MathUtils.PI2)) % MathUtils.PI2);
+        Gdx.app.log("speed", "" + body.getLinearVelocity());
 
     }
 
@@ -112,10 +119,13 @@ public class Creature extends GameActor {
 
             setPosition(body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2);
 
+//            TODO: Set proper rotation
+//            setRotation(WorldUtils.transformAngle(body.getAngle())*MathUtils.radiansToDegrees);
+
             if (body.getPosition().epsilonEquals(waypoint, 0.05f)) {
                 stop();
             }
-            if (Math.abs(waypoint_angle - ((body.getAngle() % MathUtils.PI2 + MathUtils.PI2)) % MathUtils.PI2) <= 0.01) {
+            if (Math.abs(waypoint_angle - WorldUtils.transformAngle(body.getAngle())) <= 0.05) {
                 body.setAngularVelocity(0);
             }
         }

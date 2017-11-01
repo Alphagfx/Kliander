@@ -1,12 +1,30 @@
 TODO:
 
+fixme   world timestep || creature speed (+angular) so it would not miss waypoints
+
+check info about world timestep
+
 Game Turns
 
 new Creature child
+    FOV
+        check every actor for being inside FOV
+        create custom body for representing FOV and check inside it (if possible)
+            create custom line moving from actor
+            create polygon or smth like this
+~    Health
+~    Weapons
+~        Bullets
+
+new Controls!
+
+Custom bodies
 
 GameStage.java implements ContactListener (controls)
 
 Reimplement Obstacle
+
+CameraInputController
 
 ~Camera and Viewport
 ~Camera handleInput replace with event handle

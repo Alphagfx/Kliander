@@ -2,6 +2,7 @@ package com.alphagfx.kliander.utils;
 
 import com.alphagfx.kliander.box2d.CreatureUserData;
 import com.alphagfx.kliander.box2d.ObstacleUserData;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 
@@ -68,6 +69,49 @@ public class WorldUtils {
         shape.dispose();
 
         return body;
+    }
+
+    public static Body createBullet(World world, Vector2 position) {
+
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.position.set(position);
+        bodyDef.bullet = true;
+
+        CircleShape shape = new CircleShape();
+        shape.setRadius(0.5f);
+
+        Body body = world.createBody(bodyDef);
+        body.createFixture(shape, 0.1f);
+
+        shape.dispose();
+
+        return body;
+
+    }
+
+    public static Body createWeapon(World world, Vector2 position, float angle, float width, float height) {
+
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.position.set(position);
+
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(width, height);
+
+        Body body = world.createBody(bodyDef);
+        body.createFixture(shape, 100f);
+        body.setTransform(position, angle);
+
+        shape.dispose();
+
+        return body;
+
+    }
+
+    //    Transforms angle in bounds between 0 and 2*PI
+    public static float transformAngle(float angle) {
+        return ((angle % MathUtils.PI2 + MathUtils.PI2)) % MathUtils.PI2;
     }
 
     //    Basic Circle contains, used instead of a Shape2D
