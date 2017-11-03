@@ -1,7 +1,5 @@
 package com.alphagfx.kliander.utils;
 
-import com.alphagfx.kliander.box2d.CreatureUserData;
-import com.alphagfx.kliander.box2d.ObstacleUserData;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
@@ -13,6 +11,7 @@ public class WorldUtils {
     }
 
     public static Body createSubj(World world, Vector2 vector2) {
+
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set((vector2 != null) ? vector2 : new Vector2(0, 0));
@@ -24,7 +23,6 @@ public class WorldUtils {
         Body body = world.createBody(bodyDef);
         body.createFixture(shape, 0.5f);
         body.resetMassData();
-        body.setUserData(new CreatureUserData(2));
 
         shape.dispose();
 
@@ -32,6 +30,7 @@ public class WorldUtils {
     }
 
     public static Body createObsatcle(World world, Vector2 vector2) {
+
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.StaticBody;
         bodyDef.position.set((vector2 != null) ? vector2 : new Vector2(0, 0));
@@ -42,19 +41,19 @@ public class WorldUtils {
         Body body = world.createBody(bodyDef);
         body.createFixture(shape, 0f);
 
-        body.setUserData(new ObstacleUserData());
-
         shape.dispose();
 
         return body;
     }
 
     public static Body createWorldBorders(World world, Vector2 vectorBegin, Vector2 vectorEnd) {
+
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.StaticBody;
         bodyDef.position.set((vectorBegin != null) ? vectorBegin : new Vector2(0, 0));
 
         EdgeShape shape = new EdgeShape();
+        assert vectorBegin != null;
         shape.set(vectorBegin.x, vectorBegin.y, vectorBegin.x, vectorEnd.y);
 
         Body body = world.createBody(bodyDef);
@@ -112,6 +111,23 @@ public class WorldUtils {
     //    Transforms angle in bounds between 0 and 2*PI
     public static float transformAngle(float angle) {
         return ((angle % MathUtils.PI2 + MathUtils.PI2)) % MathUtils.PI2;
+    }
+
+    public static boolean containsInFOV(Vector2 start, Vector2 end, float startAngle) {
+
+        Vector2 ownerOrientation =
+                new Vector2((float) Math.cos(startAngle), (float) Math.sin(startAngle));
+        Vector2 targetOffset = (new Vector2()).set(end).sub(start);
+
+        float product = ownerOrientation.nor().dot(targetOffset.nor());
+        float checkAngle = (float) Math.acos(product);
+        float FIELD_OF_VIEW_ANGLE = MathUtils.PI / 4;
+
+        if (checkAngle < FIELD_OF_VIEW_ANGLE) {
+            // in the field of view
+            return true;
+        }
+        return false;
     }
 
     //    Basic Circle contains, used instead of a Shape2D

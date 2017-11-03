@@ -1,15 +1,15 @@
 package com.alphagfx.kliander.actors;
 
+import com.alphagfx.kliander.enums.UserDataType;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 
 import java.util.ArrayList;
 
-public class Weapon {
+public class Weapon extends GameActor {
 
-    private Body body;
     private short bulletTypes = 1;
-    private Bullet.BulletType selectedBullet = null;
+    protected Bullet.BulletType selectedBullet;
 
     //    Relative to the body point where bullets should be created
     private Vector2 shootPoint;
@@ -23,8 +23,12 @@ public class Weapon {
 
     public Weapon(Body body, Vector2 shootPoint) {
 
-        this.body = body;
-        this.selectedBullet = Bullet.BulletType.STANDARD;
+        super(body);
+
+        setUserDataType(UserDataType.WEAPON);
+
+        setSelectedBullet(Bullet.BulletType.STANDARD);
+
         this.shootPoint = shootPoint;
 //        this.shootAngle = body.getAngle();
     }
@@ -34,7 +38,12 @@ public class Weapon {
         bullets.add(bullet);
     }
 
-    public Body getBody() {
-        return body;
+    public Bullet.BulletType getSelectedBullet() {
+        return selectedBullet;
     }
+
+    public void setSelectedBullet(Bullet.BulletType selectedBullet) {
+        this.selectedBullet = selectedBullet;
+    }
+
 }

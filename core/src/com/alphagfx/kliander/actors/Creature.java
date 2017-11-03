@@ -14,8 +14,7 @@
 
 package com.alphagfx.kliander.actors;
 
-import com.alphagfx.kliander.box2d.CreatureUserData;
-import com.alphagfx.kliander.box2d.UserData;
+import com.alphagfx.kliander.enums.UserDataType;
 import com.alphagfx.kliander.stages.GameStage;
 import com.alphagfx.kliander.utils.WorldUtils;
 import com.badlogic.gdx.Gdx;
@@ -37,6 +36,8 @@ public class Creature extends GameActor {
     public Creature(Body body) {
         super(body);
 
+        setUserDataType(UserDataType.CREATURE);
+
         setSize(2, 2);
 //        debug
         setDebug(true);
@@ -53,18 +54,6 @@ public class Creature extends GameActor {
 
     public Body getBody() {
         return body;
-    }
-
-
-
-    @Override
-    public UserData getUserData() {
-        return (CreatureUserData) userData;
-    }
-
-    @Override
-    public void setUserData(Object object) {
-        this.userData = (CreatureUserData) object;
     }
 
     public void stop() {
@@ -97,8 +86,6 @@ public class Creature extends GameActor {
 //        Angular velocity
         if (Math.abs(waypoint_angle - body_angle) > 0.05) {
             body.setAngularVelocity((((waypoint_angle - body_angle) + MathUtils.PI2) % MathUtils.PI2 > MathUtils.PI) ? -turn_speed : turn_speed);
-//            System.out.println("speedup");
-//            System.out.println("angular " + body.getAngularVelocity());
         }
 
     }

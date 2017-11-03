@@ -14,22 +14,15 @@
 
 package com.alphagfx.kliander.actors;
 
-import com.alphagfx.kliander.box2d.UserData;
+import com.alphagfx.kliander.enums.UserDataType;
 import com.badlogic.gdx.physics.box2d.Body;
 
 public class Obstacle extends GameActor {
 
     public Obstacle(Body body) {
         super(body);
+
+        setUserDataType(UserDataType.OBSTACLE);
     }
 
-    @Override
-    public UserData getUserData() {
-        return null;
-    }
-
-    @Override
-    public void setUserData(Object object) {
-        this.userData = (UserData) object;
-    }
 }

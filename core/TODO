@@ -13,16 +13,16 @@ new Creature child
             create custom line moving from actor
             create polygon or smth like this
 ~    Health
-~    Weapons
-~        Bullets
+~~    Weapons
+~~        Bullets
+~~        Hit listener
 
 new Controls!
+    set Angular and Linear velocities separately
 
 Custom bodies
 
-GameStage.java implements ContactListener (controls)
-
-Reimplement Obstacle
+~Reimplement Obstacle
 
 CameraInputController
 
@@ -45,4 +45,9 @@ Controls fix (add proper mouse support for zoom)
 Controls fix (movement through the screen)
 
 Creature Actor position and rotation fix (diff math)
+
+GameStage.java implements ContactListener (controls) (not implements but sets up)
+
+remove UserData, UserDataType and move all references to GameActors ( IBodyUserData now represents this )
+
 

@@ -1,6 +1,7 @@
 package com.alphagfx.kliander.actors;
 
 import com.alphagfx.kliander.utils.WorldUtils;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -15,9 +16,12 @@ public class Fighter extends Creature {
     private Weapon weapon;
     private DistanceJoint distJoint;
     private WeldJoint weldJoint;
+    private Vector2 target;
 
     public Fighter(Body body, Weapon weapon) {
         super(body);
+
+//        setBody(body);
 
         this.weapon = weapon;
         health = 100;
@@ -49,4 +53,18 @@ public class Fighter extends Creature {
         weapon.fire(body.getAngle());
     }
 
+    public void setTarget(Vector2 target) {
+        this.target = target;
+
+        // FIXME: 11/1/17 remove later
+        if (target != null && WorldUtils.containsInFOV(body.getPosition(), target, WorldUtils.transformAngle(body.getAngle()))) {
+            Gdx.app.log("angle", "contains " + body.getPosition() + " : " + target);
+        }
+    }
+
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+
+    }
 }
