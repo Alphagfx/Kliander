@@ -1,7 +1,6 @@
 package com.alphagfx.kliander.stages;
 
-import com.alphagfx.kliander.actors.Creature;
-import com.alphagfx.kliander.actors.Fighter;
+import com.alphagfx.kliander.actors.*;
 import com.alphagfx.kliander.box2d.IBodyUserData;
 import com.alphagfx.kliander.utils.CameraHandle;
 import com.alphagfx.kliander.utils.Constants;
@@ -28,14 +27,15 @@ public class GameStage extends Stage {
     private final static float TIME_STEP = 1 / 200f;
     private float accumulator = 0;
 
-    private Creature selectedCreature;
+    private GameActor selectedGameActor;
 
     private Body worldBorder;
-    private Body obstacle;
+    private Obstacle obstacle;
 
     public GameStage() {
 
         world = WorldUtils.createWorld();
+
 
         debugRenderer = new Box2DDebugRenderer();
 
@@ -49,10 +49,12 @@ public class GameStage extends Stage {
         worldBorder = WorldUtils.createWorldBorders(world, new Vector2(1, 1),
                 new Vector2(Constants.WORLD_WIDTH - 1, Constants.WORLD_HEIGHT - 1));
 
-        obstacle = WorldUtils.createObsatcle(world, new Vector2(15, 5));
+        addActor(new Obstacle(WorldUtils.createObstacle(world, new Vector2(15, 5)), 2, 2));
 
         for (int i = 0; i < 5; i++) {
-            addCreature();
+            float angle = MathUtils.random(MathUtils.PI2);
+            angle = 0;
+            addCreature(new Vector2((float) Math.random() * 90 + 5, (float) Math.random() * 90 + 5), angle);
         }
     }
 
@@ -60,17 +62,20 @@ public class GameStage extends Stage {
         world.setContactListener(new ContactListener() {
             @Override
             public void beginContact(Contact contact) {
-// FIXME: 11/1/17
-                Gdx.app.log("contact listener", " body hit");
-                if (contact.getFixtureA().getBody().getUserData() != null) {
-                    Gdx.app.log("user data type", ((IBodyUserData) contact.getFixtureA().getBody().getUserData()).getUserDataType().toString());
 
-//                    Gdx.app.log(contact.getFixtureA().ge.);
-//                    if ((contact.getFixtureA().getBody() == Fighter.class && ((CreatureUserData)contact.getFixtureB().getBody().getUserData()).getUserActor().getClass() == Bullet.class)
-//                            || (((CreatureUserData)contact.getFixtureB().getBody().getUserData()).getUserActor().getClass() == Fighter.class && ((CreatureUserData)contact.getFixtureA().getBody().getUserData()).getUserActor().getClass() == Bullet.class)) {
-//                        Gdx.app.log("contact listener", " fighter and bullet hit");
-//
-//                    }
+                Object objectA = contact.getFixtureA().getBody().getUserData();
+                Object objectB = contact.getFixtureB().getBody().getUserData();
+                if (objectA instanceof Bullet) {
+                    ((Bullet) objectA).setDead(true);
+                    if (objectB instanceof IBodyUserData) {
+                        ((IBodyUserData) objectB).receiveDamage(((Bullet) objectA).getDamage());
+                    }
+                }
+                if (objectB instanceof Bullet) {
+                    ((Bullet) objectB).setDead(true);
+                    if (objectA instanceof IBodyUserData) {
+                        ((IBodyUserData) objectA).receiveDamage(((Bullet) objectB).getDamage());
+                    }
                 }
             }
 
@@ -92,15 +97,13 @@ public class GameStage extends Stage {
     }
 
 
-    public void addCreature() {
+    public void addCreature(Vector2 position, float rotation) {
 
-        Fighter newbie = new Fighter(WorldUtils.createSubj(world, new Vector2((float) Math.random() * 90 + 5, (float) Math.random() * 90 + 5)));
-
-        addActor(newbie);
+        addActor(new Fighter(WorldUtils.createSubj(world, position, rotation)));
     }
 
-    public void setSelectedCreature(Creature selectedCreature) {
-        this.selectedCreature = selectedCreature;
+    public void setSelectedGameActor(GameActor selectedGameActor) {
+        this.selectedGameActor = selectedGameActor;
     }
 
     //  Controls
@@ -116,24 +119,30 @@ public class GameStage extends Stage {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 
+        Vector2 touchPoint = camera.translateToWorld(screenX, screenY);
+
         if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-            if (selectedCreature != null) {
-                // FIXME: 11/1/17 angles
-                Vector2 vector2 = camera.translateToWorld(screenX, screenY).sub(selectedCreature.getPosition()).nor();
-                selectedCreature.moveTo(selectedCreature.getPosition(), MathUtils.atan2(vector2.y, vector2.x) + MathUtils.PI2);
-                ((Fighter) selectedCreature).fire();
+
+            if (selectedGameActor instanceof Fighter) {
+
+                Vector2 vector2 = ((Fighter) selectedGameActor).getPosition().sub(touchPoint).nor();
+                ((Fighter) selectedGameActor).turnTo(MathUtils.atan2(vector2.y, vector2.x) + MathUtils.PI);
+                ((Fighter) selectedGameActor).fire();
             }
         }
 
         if (Gdx.input.isButtonPressed(Input.Buttons.MIDDLE)) {
 
-            ((Fighter) selectedCreature).setTarget(camera.translateToWorld(screenX, screenY));
+            if (selectedGameActor instanceof Fighter) {
+                ((Fighter) selectedGameActor).setTarget(touchPoint);
+            }
         }
 
         if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
-            if (selectedCreature != null) {
-                selectedCreature.moveTo(camera.translateToWorld(screenX, screenY), MathUtils.random(MathUtils.PI2));
-//                selectedCreature.moveTo(camera.translateToWorld(screenX, screenY));
+
+            if (selectedGameActor instanceof Creature) {
+                ((Creature) selectedGameActor).moveTo(touchPoint);
+//                selectedGameActor.moveTo(camera.translateToWorld(screenX, screenY));
 //                keyDown(Input.Keys.C);
             }
         }
@@ -155,7 +164,7 @@ public class GameStage extends Stage {
         }
 
         if (keyCode == Input.Keys.C) {
-            selectedCreature.getActorPosition();
+            ((Creature) selectedGameActor).getActorPosition();
         }
 
         return super.keyDown(keyCode);
@@ -187,6 +196,8 @@ public class GameStage extends Stage {
             world.step(TIME_STEP, 6, 2);
             accumulator -= delta;
         }
+
+        WorldUtils.checkDeadBodies(world);
 
     }
 

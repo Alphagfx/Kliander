@@ -2,9 +2,22 @@ TODO:
 
 fixme   world timestep || creature speed (+angular) so it would not miss waypoints
 
+fixme   weapon destroy
+
 check info about world timestep
 
+UI
+    scene2d
+        weapon -> Actor -> clickable -> menu for selection ( for example bullets )
+
 Game Turns
+    energy
+
+new Game Screens
+
+Player differentiate
+    ids
+    xml
 
 new Creature child
     FOV
@@ -13,16 +26,22 @@ new Creature child
             create custom line moving from actor
             create polygon or smth like this
 ~    Health
+~        IHealth || IDestroyable ?
+~                ? Can be merged GameActor and bullet implementations?
+~            Damage
+~            set-getHealth
 ~~    Weapons
+        correct aiming relative to weapon position
 ~~        Bullets
+            PooledLinkedList ?
 ~~        Hit listener
+    Equipment
+
+isSensor
 
 new Controls!
-    set Angular and Linear velocities separately
 
 Custom bodies
-
-~Reimplement Obstacle
 
 CameraInputController
 
@@ -44,10 +63,16 @@ Clear Creature and GameStage
 Controls fix (add proper mouse support for zoom)
 Controls fix (movement through the screen)
 
-Creature Actor position and rotation fix (diff math)
+Creature Actor position and rotation fix
 
 GameStage.java implements ContactListener (controls) (not implements but sets up)
 
 remove UserData, UserDataType and move all references to GameActors ( IBodyUserData now represents this )
 
+    set Angular and Linear velocities separately
 
+    correct actor mouse hitbox with body
+
+Reimplement Obstacle
+
+fixed   wrong body || weapon rotation on creation

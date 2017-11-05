@@ -3,6 +3,7 @@ package com.alphagfx.kliander.utils;
 import com.badlogic.gdx.math.Vector2;
 
 public class Constants {
+
     public final static int APP_WIDTH = 1024;
     public final static int APP_HEIGHT = 768;
 
@@ -14,5 +15,7 @@ public class Constants {
 
     public final static Vector2 WORLD_GRAVITY = new Vector2(0, 0);
 
+    public final static float GAME_ACTOR_DEFAULT_SIZE_X = 2;
+    public final static float GAME_ACTOR_DEFAULT_SIZE_Y = 2;
 
 }

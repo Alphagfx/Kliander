@@ -19,10 +19,12 @@ import com.badlogic.gdx.physics.box2d.Body;
 
 public class Obstacle extends GameActor {
 
-    public Obstacle(Body body) {
-        super(body);
+    public Obstacle(Body body, float sizeX, float sizeY) {
+        super(body, sizeX, sizeY);
 
         setUserDataType(UserDataType.OBSTACLE);
+
+        setInvincible(true);
     }
 
 }

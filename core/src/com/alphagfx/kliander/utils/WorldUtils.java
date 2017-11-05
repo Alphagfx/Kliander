@@ -1,8 +1,12 @@
 package com.alphagfx.kliander.utils;
 
+import com.alphagfx.kliander.actors.GameActor;
+import com.alphagfx.kliander.box2d.IBodyUserData;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.utils.Array;
 
 public class WorldUtils {
 
@@ -10,11 +14,12 @@ public class WorldUtils {
         return new World(Constants.WORLD_GRAVITY, true);
     }
 
-    public static Body createSubj(World world, Vector2 vector2) {
+    public static Body createSubj(World world, Vector2 vector2, float rotation) {
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set((vector2 != null) ? vector2 : new Vector2(0, 0));
+        bodyDef.angle = rotation;
 
         //  fix me
         PolygonShape shape = new PolygonShape();
@@ -29,7 +34,7 @@ public class WorldUtils {
         return body;
     }
 
-    public static Body createObsatcle(World world, Vector2 vector2) {
+    public static Body createObstacle(World world, Vector2 vector2) {
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.StaticBody;
@@ -81,7 +86,7 @@ public class WorldUtils {
         shape.setRadius(0.5f);
 
         Body body = world.createBody(bodyDef);
-        body.createFixture(shape, 0.1f);
+        body.createFixture(shape, 0.01f);
 
         shape.dispose();
 
@@ -89,6 +94,7 @@ public class WorldUtils {
 
     }
 
+    // FIXME: 11/4/17 add Weapon as actor to the GameStage
     public static Body createWeapon(World world, Vector2 position, float angle, float width, float height) {
 
         BodyDef bodyDef = new BodyDef();
@@ -99,7 +105,7 @@ public class WorldUtils {
         shape.setAsBox(width, height);
 
         Body body = world.createBody(bodyDef);
-        body.createFixture(shape, 100f);
+        body.createFixture(shape, 1f);
         body.setTransform(position, angle);
 
         shape.dispose();
@@ -128,6 +134,22 @@ public class WorldUtils {
             return true;
         }
         return false;
+    }
+
+    public static void checkDeadBodies(World world) {
+
+        Array<Body> bodies = new Array<>();
+        world.getBodies(bodies);
+
+        for (Body body : bodies) {
+            if (body.getUserData() instanceof GameActor && ((GameActor) body.getUserData()).isDead())
+                if (!((GameActor) body.getUserData()).remove()) {
+                    Gdx.app.log("actor", "actor was not removed properly \n     " + body.getUserData().toString());
+                }
+            if (body.getUserData() instanceof IBodyUserData)
+                ((IBodyUserData) body.getUserData()).destroyBodyUser();
+
+        }
     }
 
     //    Basic Circle contains, used instead of a Shape2D

@@ -6,38 +6,35 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.MassData;
-import com.badlogic.gdx.physics.box2d.joints.DistanceJoint;
 import com.badlogic.gdx.physics.box2d.joints.WeldJoint;
 import com.badlogic.gdx.physics.box2d.joints.WeldJointDef;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 
 public class Fighter extends Creature {
 
-    private float health;
     private Weapon weapon;
-    private DistanceJoint distJoint;
     private WeldJoint weldJoint;
     private Vector2 target;
 
     public Fighter(Body body, Weapon weapon) {
         super(body);
 
-//        setBody(body);
-
         this.weapon = weapon;
-        health = 100;
+
+        weapon.setHealth(10);
+
+        setHealth(100);
 
         WeldJointDef weldJointDef = new WeldJointDef();
-
         weldJointDef.initialize(weapon.getBody(), body, weapon.getBody().getPosition());
 //        weldJointDef.dampingRatio = 0;
 //        weldJointDef.frequencyHz = 10;
-
         weldJoint = (WeldJoint) body.getWorld().createJoint(weldJointDef);
 
         weapon.getBody().setMassData(new MassData() {
             {
                 mass = 0.0001f;
-                center.set(Fighter.this.body.getMassData().center);
+                center.set(body.getMassData().center);
                 I = 0.0001f;
             }
         });
@@ -49,8 +46,17 @@ public class Fighter extends Creature {
                 -MathUtils.PI / 2, 0.2f, 1f), new Vector2(0, 1.6f)));
     }
 
+    @Override
+    protected void setStage(Stage stage) {
+        super.setStage(stage);
+        if (weapon.getStage() == null) {
+            stage.addActor(weapon);
+        }
+    }
+
     public void fire() {
         weapon.fire(body.getAngle());
+        Gdx.app.log("weapon", weapon == null ? "null" : "present");
     }
 
     public void setTarget(Vector2 target) {
@@ -63,8 +69,8 @@ public class Fighter extends Creature {
     }
 
     @Override
-    public void act(float delta) {
-        super.act(delta);
-
+    public void setDead(boolean isDead) {
+        super.setDead(isDead);
+        weapon.setDead(isDead);
     }
 }

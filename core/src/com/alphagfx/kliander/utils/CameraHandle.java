@@ -16,16 +16,7 @@ public class CameraHandle implements ApplicationListener {
     private ExtendViewport viewport;
     private float rotationSpeed;
 
-    //        Probably should use camera.unproject but there is smth mad happening
-//      Now it works :\
     public Vector2 translateToWorld(int screenX, int screenY) {
-        /*Vector2 vector2 = new Vector2();
-        vector2.x = (float) screenX / Gdx.graphics.getWidth()*camera.viewportWidth*camera.zoom + (camera.position.x - camera.viewportWidth/2);
-        vector2.y = (1 - (float) screenY / Gdx.graphics.getHeight())*camera.viewportHeight*camera.zoom + (camera.position.y - camera.viewportHeight/2);
-        Gdx.app.log("camera pos", camera.position.toString());
-        Gdx.app.log("translate", vector2.toString());
-        Gdx.app.log("unproject", camera.unproject(new Vector3(screenX, screenY, 0)).toString());
-        */
         Vector3 vector3 = camera.unproject(new Vector3(screenX, screenY, 0));
         return new Vector2(vector3.x, vector3.y);
     }

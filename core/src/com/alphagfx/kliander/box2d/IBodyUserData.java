@@ -13,4 +13,36 @@ public interface IBodyUserData {
 
     void setUserDataType(UserDataType userDataType);
 
+    void setDead(boolean isDead);
+
+    boolean isDead();
+
+
+    float getHealth();
+
+    void setHealth(float health);
+
+    default void receiveDamage(float damage) {
+        setHealth(getHealth() - damage);
+        if (getHealth() <= 0) {
+            setDead(true);
+        }
+    }
+
+    boolean isInvincible();
+
+    void setInvincible(boolean invincible);
+
+
+    default boolean destroyBodyUser() {
+
+        if (isDead() == true && getBody() != null && getBody().getWorld() != null) {
+
+            getBody().getWorld().destroyBody(getBody());
+            return true;
+        }
+
+        return false;
+    }
+
 }
