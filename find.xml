@@ -1,6 +1,7 @@
 <application>
   <component name="FindSettings">
-    <option name="localWholeWordsOnly" value="true" />
-    <option name="LOCAL_WHOLE_WORDS_ONLY" value="true" />
+    <option name="customScope" value="File '[core] - .../core/src/com/alphagfx/kliander/utils/CameraHandle.java'" />
+    <option name="defaultScopeName" value="File '[core] - .../core/src/com/alphagfx/kliander/utils/CameraHandle.java'" />
+    <option name="SEARCH_SCOPE" value="File '[core] - .../core/src/com/alphagfx/kliander/utils/CameraHandle.java'" />
   </component>
 </application>
