@@ -51,7 +51,7 @@ public class WorldUtils {
         return body;
     }
 
-    public static Body createWorldBorders(World world, Vector2 vectorBegin, Vector2 vectorEnd) {
+    public static void createWorldBorders(World world, Vector2 vectorBegin, Vector2 vectorEnd) {
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.StaticBody;
@@ -72,7 +72,6 @@ public class WorldUtils {
 
         shape.dispose();
 
-        return body;
     }
 
     public static Body createBullet(World world, Vector2 position) {
@@ -129,11 +128,7 @@ public class WorldUtils {
         float checkAngle = (float) Math.acos(product);
         float FIELD_OF_VIEW_ANGLE = MathUtils.PI / 4;
 
-        if (checkAngle < FIELD_OF_VIEW_ANGLE) {
-            // in the field of view
-            return true;
-        }
-        return false;
+        return checkAngle < FIELD_OF_VIEW_ANGLE;
     }
 
     public static void checkDeadBodies(World world) {

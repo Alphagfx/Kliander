@@ -10,7 +10,6 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
 public class GameStage extends Stage {
@@ -20,33 +19,23 @@ public class GameStage extends Stage {
     //  Debug
     private Box2DDebugRenderer debugRenderer;
 
-    private CameraHandle camera;
-    private boolean camera_read;
-
     //  Time management
     private final static float TIME_STEP = 1 / 200f;
     private float accumulator = 0;
 
     private GameActor selectedGameActor;
 
-    private Body worldBorder;
-    private Obstacle obstacle;
+    public GameStage(CameraHandle cameraHandle) {
 
-    public GameStage() {
+        super(cameraHandle);
 
         world = WorldUtils.createWorld();
-
 
         debugRenderer = new Box2DDebugRenderer();
 
         setContactListener();
 
-        camera = new CameraHandle();
-        camera.create();
-
-        setViewport(camera.getViewport());
-
-        worldBorder = WorldUtils.createWorldBorders(world, new Vector2(1, 1),
+        WorldUtils.createWorldBorders(world, new Vector2(1, 1),
                 new Vector2(Constants.WORLD_WIDTH - 1, Constants.WORLD_HEIGHT - 1));
 
         addActor(new Obstacle(WorldUtils.createObstacle(world, new Vector2(15, 5)), 2, 2));
@@ -109,17 +98,9 @@ public class GameStage extends Stage {
     //  Controls
 
     @Override
-    public boolean scrolled(int amount) {
-
-        camera.scrollZoom(amount);
-
-        return super.scrolled(amount);
-    }
-
-    @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 
-        Vector2 touchPoint = camera.translateToWorld(screenX, screenY);
+        Vector2 touchPoint = screenToStageCoordinates(new Vector2(screenX, screenY));
 
         if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
 
@@ -150,44 +131,11 @@ public class GameStage extends Stage {
         return super.touchDown(screenX, screenY, pointer, button);
     }
 
-    @Override
-    public boolean keyDown(int keyCode) {
-
-        camera_read = true;
-
-        if (keyCode == Input.Keys.Z) {
-            for (Actor actor : getActors()) {
-                if (actor.getClass() == Creature.class) {
-                    ((Creature) actor).getActorPosition();
-                }
-            }
-        }
-
-        if (keyCode == Input.Keys.C) {
-            ((Creature) selectedGameActor).getActorPosition();
-        }
-
-        return super.keyDown(keyCode);
-    }
-
-    @Override
-    public boolean keyUp(int keyCode) {
-
-        camera_read = false;
-
-        return super.keyUp(keyCode);
-    }
-
     //  Main process loop
 
     @Override
     public void act(float delta) {
         super.act(delta);
-
-        if (camera_read) {
-            camera.handleInput();
-        }
-        camera.render();
 
         //  fixed time step
         accumulator += delta;
@@ -204,10 +152,8 @@ public class GameStage extends Stage {
     @Override
     public void draw() {
         super.draw();
-        debugRenderer.render(world, camera.getMatrixCombined());
+
+        debugRenderer.render(world, getCamera().combined);
     }
 
-    public void resize(int width, int height) {
-        camera.resize(width, height);
-    }
 }

@@ -19,7 +19,21 @@ public class Fighter extends Creature {
     public Fighter(Body body, Weapon weapon) {
         super(body);
 
+        addWeapon(weapon);
+    }
+
+    public Fighter(Body body) {
+        this(body, new Weapon(WorldUtils.createWeapon(body.getWorld(), body.getPosition().add(0, -2),
+                -MathUtils.PI / 2, 0.2f, 1f), new Vector2(0, 1.6f)));
+    }
+
+    public void addWeapon(Weapon weapon) {
+
         this.weapon = weapon;
+
+        if (getStage() != null && weapon != null && weapon.getStage() == null) {
+            getStage().addActor(weapon);
+        }
 
         weapon.setHealth(10);
 
@@ -29,7 +43,7 @@ public class Fighter extends Creature {
         weldJointDef.initialize(weapon.getBody(), body, weapon.getBody().getPosition());
 //        weldJointDef.dampingRatio = 0;
 //        weldJointDef.frequencyHz = 10;
-        weldJoint = (WeldJoint) body.getWorld().createJoint(weldJointDef);
+        body.getWorld().createJoint(weldJointDef);
 
         weapon.getBody().setMassData(new MassData() {
             {
@@ -38,18 +52,13 @@ public class Fighter extends Creature {
                 I = 0.0001f;
             }
         });
-
-    }
-
-    public Fighter(Body body) {
-        this(body, new Weapon(WorldUtils.createWeapon(body.getWorld(), body.getPosition().add(0, -2),
-                -MathUtils.PI / 2, 0.2f, 1f), new Vector2(0, 1.6f)));
     }
 
     @Override
     protected void setStage(Stage stage) {
         super.setStage(stage);
-        if (weapon.getStage() == null) {
+
+        if (stage != null && weapon != null && weapon.getStage() == null) {
             stage.addActor(weapon);
         }
     }

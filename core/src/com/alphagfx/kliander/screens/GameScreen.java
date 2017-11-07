@@ -1,16 +1,35 @@
 package com.alphagfx.kliander.screens;
 
 import com.alphagfx.kliander.stages.GameStage;
+import com.alphagfx.kliander.stages.UIStage;
+import com.alphagfx.kliander.utils.CameraHandle;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 
 public class GameScreen implements Screen {
 
     private GameStage gameStage;
+    private UIStage uiStage;
+    private InputMultiplexer inputMultiplexer;
+
+    private CameraHandle camera = new CameraHandle();
 
     public GameScreen() {
-        gameStage = new GameStage();
+
+        camera = new CameraHandle();
+
+        gameStage = new GameStage(camera);
+        uiStage = new UIStage(camera);
+
+        inputMultiplexer = new InputMultiplexer(uiStage, gameStage, camera.getCameraInput());
+
+        Gdx.input.setInputProcessor(inputMultiplexer);
+
+    }
+
+    public void switchStage() {
     }
 
     @Override
@@ -18,10 +37,13 @@ public class GameScreen implements Screen {
         //  Clear the screen
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        Gdx.input.setInputProcessor(gameStage);
+        camera.getCameraInput().act();
 
-        gameStage.draw();
         gameStage.act(delta);
+        gameStage.draw();
+
+        uiStage.act(delta);
+        uiStage.draw();
     }
 
     @Override
@@ -31,7 +53,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        gameStage.resize(width, height);
+        camera.getCameraInput().resize();
     }
 
     @Override
