@@ -7,6 +7,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class GameScreen implements Screen {
 
@@ -21,7 +22,7 @@ public class GameScreen implements Screen {
         camera = new CameraHandle();
 
         gameStage = new GameStage(camera);
-        uiStage = new UIStage(camera);
+        uiStage = new UIStage(new ScreenViewport(), gameStage);
 
         inputMultiplexer = new InputMultiplexer(uiStage, gameStage, camera.getCameraInput());
 
@@ -74,6 +75,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
-
+        gameStage.dispose();
+        uiStage.dispose();
     }
 }

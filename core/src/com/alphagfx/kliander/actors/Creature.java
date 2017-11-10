@@ -21,7 +21,52 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+
 public class Creature extends GameActor {
+
+    protected static Set<String> actionStack;
+
+    static {
+        actionStack = new LinkedHashSet<>(GameActor.actionStack);
+        actionStack.addAll(Arrays.asList("MOVE", "TURN", "STOP"));
+    }
+
+    @Override
+    public Set<String> getActionStack() {
+        return actionStack;
+    }
+
+    @Override
+    public boolean doGameAction(String action, Vector2 vector) {
+
+        boolean action_performed = true;
+
+        switch (action) {
+            case "MOVE": {
+                moveTo(vector);
+                break;
+            }
+
+            case "STOP": {
+                stop();
+                break;
+            }
+            case "TURN": {
+                Vector2 vector2 = getPosition().sub(vector).nor();
+                turnTo(MathUtils.atan2(vector2.y, vector2.x) + MathUtils.PI);
+                break;
+            }
+            default: {
+                action_performed = false;
+            }
+        }
+
+        return action_performed;
+    }
 
     private float max_speed = 20;
     private float turn_speed = 5;

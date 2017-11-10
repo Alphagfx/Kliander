@@ -6,14 +6,48 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.MassData;
-import com.badlogic.gdx.physics.box2d.joints.WeldJoint;
 import com.badlogic.gdx.physics.box2d.joints.WeldJointDef;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 public class Fighter extends Creature {
 
+    protected static Set<String> actionStack;
+
+    static {
+        actionStack = new LinkedHashSet<>();
+        actionStack.addAll(Creature.actionStack);
+        actionStack.add("FIRE");
+    }
+
+    @Override
+    public Set<String> getActionStack() {
+        return actionStack;
+    }
+
+    @Override
+    public boolean doGameAction(String action, Vector2 vector) {
+        boolean action_performed = true;
+        switch (action) {
+            case "FIRE": {
+                fire();
+                break;
+            }
+            default: {
+                action_performed = false;
+                break;
+            }
+        }
+        if (!action_performed) {
+            action_performed = super.doGameAction(action, vector);
+        }
+        return action_performed;
+    }
+
     private Weapon weapon;
-    private WeldJoint weldJoint;
+
     private Vector2 target;
 
     public Fighter(Body body, Weapon weapon) {
@@ -35,7 +69,9 @@ public class Fighter extends Creature {
             getStage().addActor(weapon);
         }
 
-        weapon.setHealth(10);
+        if (weapon != null) {
+            weapon.setHealth(10);
+        }
 
         setHealth(100);
 
@@ -63,9 +99,9 @@ public class Fighter extends Creature {
         }
     }
 
-    public void fire() {
+    private void fire() {
         weapon.fire(body.getAngle());
-        Gdx.app.log("weapon", weapon == null ? "null" : "present");
+//        Gdx.app.log("weapon", weapon == null ? "null" : "present");
     }
 
     public void setTarget(Vector2 target) {

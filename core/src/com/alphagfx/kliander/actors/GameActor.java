@@ -7,10 +7,14 @@ import com.alphagfx.kliander.utils.Constants;
 import com.alphagfx.kliander.utils.WorldUtils;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public abstract class GameActor extends Actor implements IBodyUserData {
 
@@ -20,6 +24,17 @@ public abstract class GameActor extends Actor implements IBodyUserData {
 
     protected float health = 100;
     protected boolean invincible;
+
+    protected static Set<String> actionStack;
+
+    static {
+        actionStack = new LinkedHashSet<>();
+        actionStack.add("GAME ACTOR");
+    }
+
+    public Set<String> getActionStack() {
+        return actionStack;
+    }
 
     public GameActor(Body body, float sizeX, float sizeY) {
 
@@ -49,6 +64,10 @@ public abstract class GameActor extends Actor implements IBodyUserData {
 
         this(body, Constants.GAME_ACTOR_DEFAULT_SIZE_X, Constants.GAME_ACTOR_DEFAULT_SIZE_Y);
 
+    }
+
+    public boolean doGameAction(String action, Vector2 vector) {
+        return false;
     }
 
 

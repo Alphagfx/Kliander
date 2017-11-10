@@ -14,6 +14,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 
 public class GameStage extends Stage {
 
+    private UIStage uiStage;
+
     private World world;
 
     //  Debug
@@ -45,6 +47,8 @@ public class GameStage extends Stage {
             angle = 0;
             addCreature(new Vector2((float) Math.random() * 90 + 5, (float) Math.random() * 90 + 5), angle);
         }
+        selectedGameActor = new Fighter(WorldUtils.createSubj(world, new Vector2(50, 50), 0));
+        addActor(selectedGameActor);
     }
 
     private void setContactListener() {
@@ -85,6 +89,9 @@ public class GameStage extends Stage {
         });
     }
 
+    public void setUiStage(UIStage uiStage) {
+        this.uiStage = uiStage;
+    }
 
     public void addCreature(Vector2 position, float rotation) {
 
@@ -93,6 +100,10 @@ public class GameStage extends Stage {
 
     public void setSelectedGameActor(GameActor selectedGameActor) {
         this.selectedGameActor = selectedGameActor;
+    }
+
+    public GameActor getSelectedGameActor() {
+        return selectedGameActor;
     }
 
     //  Controls
@@ -104,18 +115,15 @@ public class GameStage extends Stage {
 
         if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
 
-            if (selectedGameActor instanceof Fighter) {
+            selectedGameActor.doGameAction(uiStage.getSelectedAction(), touchPoint);
 
-                Vector2 vector2 = ((Fighter) selectedGameActor).getPosition().sub(touchPoint).nor();
-                ((Fighter) selectedGameActor).turnTo(MathUtils.atan2(vector2.y, vector2.x) + MathUtils.PI);
-                ((Fighter) selectedGameActor).fire();
-            }
         }
 
         if (Gdx.input.isButtonPressed(Input.Buttons.MIDDLE)) {
 
-            if (selectedGameActor instanceof Fighter) {
-                ((Fighter) selectedGameActor).setTarget(touchPoint);
+            if (selectedGameActor instanceof GameActor) {
+                selectedGameActor.doGameAction("FIRE", touchPoint);
+                Gdx.app.log(selectedGameActor.toString(), selectedGameActor.getActionStack().toString());
             }
         }
 
@@ -123,8 +131,6 @@ public class GameStage extends Stage {
 
             if (selectedGameActor instanceof Creature) {
                 ((Creature) selectedGameActor).moveTo(touchPoint);
-//                selectedGameActor.moveTo(camera.translateToWorld(screenX, screenY));
-//                keyDown(Input.Keys.C);
             }
         }
 
