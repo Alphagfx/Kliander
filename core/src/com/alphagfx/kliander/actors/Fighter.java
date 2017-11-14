@@ -14,17 +14,17 @@ import java.util.Set;
 
 public class Fighter extends Creature {
 
-    protected static Set<String> actionStack;
+    protected static Set<String> actionSet;
 
     static {
-        actionStack = new LinkedHashSet<>();
-        actionStack.addAll(Creature.actionStack);
-        actionStack.add("FIRE");
+        actionSet = new LinkedHashSet<>();
+        actionSet.addAll(Creature.actionSet);
+        actionSet.add("FIRE");
     }
 
     @Override
-    public Set<String> getActionStack() {
-        return actionStack;
+    public Set<String> getActionSet() {
+        return actionSet;
     }
 
     @Override
@@ -57,8 +57,8 @@ public class Fighter extends Creature {
     }
 
     public Fighter(Body body) {
-        this(body, new Weapon(WorldUtils.createWeapon(body.getWorld(), body.getPosition().add(0, -2),
-                -MathUtils.PI / 2, 0.2f, 1f), new Vector2(0, 1.6f)));
+        this(body, new Weapon(WorldUtils.createWeapon(body.getWorld(), body.getPosition().add(1.5f, -0.7f),
+                -MathUtils.PI / 2, 0.2f, 0.7f), new Vector2(0, 1.3f)));
     }
 
     public void addWeapon(Weapon weapon) {
@@ -117,5 +117,10 @@ public class Fighter extends Creature {
     public void setDead(boolean isDead) {
         super.setDead(isDead);
         weapon.setDead(isDead);
+    }
+
+    @Override
+    public String toString() {
+        return "Fighter";
     }
 }

@@ -4,52 +4,43 @@ fixme   world timestep || creature speed (+angular) so it would not miss waypoin
 
 fixme   weapon destroy
 fixme   random Fighter rotation
-fixme   merge Fighter body and weapon body (createFixture)
 
 check info about world timestep
+
+Game Turns
+    energy
 
 UI
     scene2d
         weapon -> Actor -> clickable -> menu for selection ( for example bullets )
 
-Game Turns
-    energy
-
-new Game Screens
-
 Player differentiate
     ids
     xml
 
-new Creature child
     FOV
         check every actor for being inside FOV
         create custom body for representing FOV and check inside it (if possible)
             create custom line moving from actor
             create polygon or smth like this
-~    Health
-~        IHealth || IDestroyable ?
+
+~       IHealth || IDestroyable ?
 ~                ? Can be merged GameActor and bullet implementations?
-~            Damage
-~            set-getHealth
-~~    Weapons
         correct aiming relative to weapon position
-~~        Bullets
-            PooledLinkedList ?
-~~        Hit listener
     Equipment
 
 isSensor
 
 Custom bodies
 
+fixme ui resize
+
 ?(Serializable)
 
 multiple creature select
 
 https://github.com/libgdx/libgdx/blob/master/tests/gdx-tests/src/com/badlogic/gdx/tests/Box2DTest.java
-World.QueryAABB
-Fixture select
+
 
 Completed:
 Clear Creature and GameStage
@@ -62,12 +53,30 @@ remove UserData, UserDataType and move all references to GameActors ( IBodyUserD
 
     set Angular and Linear velocities separately
 
-    correct actor mouse hitbox with body
 
 Reimplement Obstacle
 InputMultiplexer
 
 fixed   wrong body || weapon rotation on creation
 fixed   freaking camera viewport
+fixed   merge Fighter body and weapon body (createFixture) (nothing, this has no sense)
+
+
+
+new Game Screens
+
+new Creature child
+       Health
+            Damage
+            set-getHealth
+    Weapons
+        Bullets
+        Hit listener
+
+World.QueryAABB
+Fixture select
+        correct actor mouse hitbox with body
+
+
 
 

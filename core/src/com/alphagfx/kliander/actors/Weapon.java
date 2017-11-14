@@ -2,7 +2,6 @@ package com.alphagfx.kliander.actors;
 
 import com.alphagfx.kliander.enums.UserDataType;
 import com.alphagfx.kliander.utils.WorldUtils;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -12,13 +11,13 @@ import java.util.LinkedList;
 public class Weapon extends GameActor {
 
     private short bulletTypes = 1;
-    protected Bullet.BulletType selectedBullet;
+    private Bullet.BulletType selectedBullet;
 
     //    Relative to the body point where bullets should be created
     private Vector2 shootPoint;
     private float shootAngle;
 
-    LinkedList<Bullet> bullets = new LinkedList<>();
+    private LinkedList<Bullet> bullets = new LinkedList<>();
 
     private float spread;
     private int ammo = 10;
@@ -26,7 +25,7 @@ public class Weapon extends GameActor {
 
     public Weapon(Body body, Vector2 shootPoint) {
 
-        super(body, 0.2f * 2, 1 * 2);
+        super(body, 1, 1);
 
         setUserDataType(UserDataType.WEAPON);
 
@@ -40,7 +39,7 @@ public class Weapon extends GameActor {
             return;
         }
         Bullet bullet = new Bullet(body.getWorld(), selectedBullet, body.getWorldPoint(shootPoint), body.getAngle());
-        Gdx.app.log("weapon body", body == null ? "null" : "present");
+//        Gdx.app.log("weapon body", body == null ? "null" : "present");
 
         bullets.addFirst(bullet);
 

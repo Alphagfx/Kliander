@@ -23,7 +23,7 @@ public class WorldUtils {
 
         //  fix me
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(1, 1);
+        shape.setAsBox(0.6f, 1.5f);
 
         Body body = world.createBody(bodyDef);
         body.createFixture(shape, 0.5f);

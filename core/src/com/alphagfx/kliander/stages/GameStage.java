@@ -10,9 +10,10 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
-public class GameStage extends Stage {
+public class GameStage extends Stage implements QueryCallback {
 
     private UIStage uiStage;
 
@@ -26,6 +27,7 @@ public class GameStage extends Stage {
     private float accumulator = 0;
 
     private GameActor selectedGameActor;
+    private boolean paused;
 
     public GameStage(CameraHandle cameraHandle) {
 
@@ -34,6 +36,8 @@ public class GameStage extends Stage {
         world = WorldUtils.createWorld();
 
         debugRenderer = new Box2DDebugRenderer();
+
+        setDebugAll(false);
 
         setContactListener();
 
@@ -49,6 +53,7 @@ public class GameStage extends Stage {
         }
         selectedGameActor = new Fighter(WorldUtils.createSubj(world, new Vector2(50, 50), 0));
         addActor(selectedGameActor);
+
     }
 
     private void setContactListener() {
@@ -100,6 +105,7 @@ public class GameStage extends Stage {
 
     public void setSelectedGameActor(GameActor selectedGameActor) {
         this.selectedGameActor = selectedGameActor;
+        Gdx.app.log("set game actor", selectedGameActor.toString());
     }
 
     public GameActor getSelectedGameActor() {
@@ -113,6 +119,8 @@ public class GameStage extends Stage {
 
         Vector2 touchPoint = screenToStageCoordinates(new Vector2(screenX, screenY));
 
+        world.QueryAABB(this, touchPoint.x, touchPoint.y, touchPoint.x, touchPoint.y);
+
         if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
 
             selectedGameActor.doGameAction(uiStage.getSelectedAction(), touchPoint);
@@ -123,7 +131,7 @@ public class GameStage extends Stage {
 
             if (selectedGameActor instanceof GameActor) {
                 selectedGameActor.doGameAction("FIRE", touchPoint);
-                Gdx.app.log(selectedGameActor.toString(), selectedGameActor.getActionStack().toString());
+                Gdx.app.log(selectedGameActor.toString(), selectedGameActor.getActionSet().toString());
             }
         }
 
@@ -144,15 +152,25 @@ public class GameStage extends Stage {
         super.act(delta);
 
         //  fixed time step
-        accumulator += delta;
+        if (!paused) {
+            accumulator += delta;
 
-        while (accumulator >= delta) {
-            world.step(TIME_STEP, 6, 2);
-            accumulator -= delta;
+            while (accumulator >= delta) {
+                world.step(TIME_STEP, 6, 2);
+                accumulator -= delta;
+            }
         }
 
         WorldUtils.checkDeadBodies(world);
 
+    }
+
+    public void setPaused(boolean paused) {
+        this.paused = paused;
+    }
+
+    public boolean isPaused() {
+        return paused;
     }
 
     @Override
@@ -160,6 +178,26 @@ public class GameStage extends Stage {
         super.draw();
 
         debugRenderer.render(world, getCamera().combined);
+    }
+
+    @Override
+    public boolean reportFixture(Fixture fixture) {
+        if (fixture.getBody() != null && fixture.getBody().getUserData() instanceof GameActor) {
+            Gdx.app.log("report fixture", fixture.getBody().getUserData().toString());
+            setSelectedGameActor(((GameActor) fixture.getBody().getUserData()));
+            uiStage.updateActionMenu();
+        }
+        return false;
+    }
+
+    public void updateActionSet() {
+        for (Actor actor : getActors()) {
+            if (actor instanceof GameActor) {
+                uiStage.updateActionSet(((GameActor) actor));
+                uiStage.updateActionMenu();
+            }
+        }
+
     }
 
 }

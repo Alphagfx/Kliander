@@ -28,16 +28,16 @@ import java.util.Set;
 
 public class Creature extends GameActor {
 
-    protected static Set<String> actionStack;
+    protected static Set<String> actionSet;
 
     static {
-        actionStack = new LinkedHashSet<>(GameActor.actionStack);
-        actionStack.addAll(Arrays.asList("MOVE", "TURN", "STOP"));
+        actionSet = new LinkedHashSet<>(GameActor.actionSet);
+        actionSet.addAll(Arrays.asList("MOVE", "TURN", "STOP"));
     }
 
     @Override
-    public Set<String> getActionStack() {
-        return actionStack;
+    public Set<String> getActionSet() {
+        return actionSet;
     }
 
     @Override

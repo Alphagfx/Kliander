@@ -36,7 +36,7 @@ public interface IBodyUserData {
 
     default boolean destroyBodyUser() {
 
-        if (isDead() == true && getBody() != null && getBody().getWorld() != null) {
+        if (isDead() && getBody() != null && getBody().getWorld() != null) {
 
             getBody().getWorld().destroyBody(getBody());
             return true;

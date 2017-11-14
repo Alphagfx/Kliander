@@ -23,6 +23,7 @@ public class GameScreen implements Screen {
 
         gameStage = new GameStage(camera);
         uiStage = new UIStage(new ScreenViewport(), gameStage);
+        gameStage.updateActionSet();
 
         inputMultiplexer = new InputMultiplexer(uiStage, gameStage, camera.getCameraInput());
 

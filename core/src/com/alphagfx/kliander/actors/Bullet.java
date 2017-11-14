@@ -16,16 +16,16 @@ public class Bullet implements IBodyUserData {
         EXPLOSIVE
     }
 
-    protected UserDataType userDataType;
+    private UserDataType userDataType;
 
-    protected Body body;
-    protected BulletType bulletType;
+    private Body body;
+    private BulletType bulletType;
 
-    protected float speed;
-    protected float damage;
+    private float speed;
+    private float damage;
 
-    protected float health;
-    protected boolean invincible;
+    private float health;
+    private boolean invincible;
 
     private boolean isDead;
 
