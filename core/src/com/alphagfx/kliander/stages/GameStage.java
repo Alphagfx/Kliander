@@ -1,6 +1,10 @@
 package com.alphagfx.kliander.stages;
 
-import com.alphagfx.kliander.actors.*;
+import com.alphagfx.kliander.actors.Bullet;
+import com.alphagfx.kliander.actors.Fighter;
+import com.alphagfx.kliander.actors.GameActor;
+import com.alphagfx.kliander.actors.Obstacle;
+import com.alphagfx.kliander.actors.actions.GameAction;
 import com.alphagfx.kliander.box2d.IBodyUserData;
 import com.alphagfx.kliander.utils.CameraHandle;
 import com.alphagfx.kliander.utils.Constants;
@@ -23,7 +27,7 @@ public class GameStage extends Stage implements QueryCallback {
     private Box2DDebugRenderer debugRenderer;
 
     //  Time management
-    private final static float TIME_STEP = 1 / 200f;
+    private final static float TIME_STEP = 1 / 300f;
     private float accumulator = 0;
 
     private GameActor selectedGameActor;
@@ -51,7 +55,7 @@ public class GameStage extends Stage implements QueryCallback {
             angle = 0;
             addCreature(new Vector2((float) Math.random() * 90 + 5, (float) Math.random() * 90 + 5), angle);
         }
-        selectedGameActor = new Fighter(WorldUtils.createSubj(world, new Vector2(50, 50), 0));
+        selectedGameActor = new Fighter(WorldUtils.createBody(world, new Vector2(50, 50), 0, 0.6f, 1.5f));
         addActor(selectedGameActor);
 
     }
@@ -98,14 +102,13 @@ public class GameStage extends Stage implements QueryCallback {
         this.uiStage = uiStage;
     }
 
-    public void addCreature(Vector2 position, float rotation) {
+    public void addCreature(Vector2 position, float angle) {
 
-        addActor(new Fighter(WorldUtils.createSubj(world, position, rotation)));
+        addActor(new Fighter(WorldUtils.createBody(world, position, angle, 0.6f, 1.5f)));
     }
 
     public void setSelectedGameActor(GameActor selectedGameActor) {
         this.selectedGameActor = selectedGameActor;
-        Gdx.app.log("set game actor", selectedGameActor.toString());
     }
 
     public GameActor getSelectedGameActor() {
@@ -123,23 +126,8 @@ public class GameStage extends Stage implements QueryCallback {
 
         if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
 
-            selectedGameActor.doGameAction(uiStage.getSelectedAction(), touchPoint);
+            selectedGameActor.addAction(new GameAction(uiStage.getSelectedAction(), 1, touchPoint));
 
-        }
-
-        if (Gdx.input.isButtonPressed(Input.Buttons.MIDDLE)) {
-
-            if (selectedGameActor instanceof GameActor) {
-                selectedGameActor.doGameAction("FIRE", touchPoint);
-                Gdx.app.log(selectedGameActor.toString(), selectedGameActor.getActionSet().toString());
-            }
-        }
-
-        if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
-
-            if (selectedGameActor instanceof Creature) {
-                ((Creature) selectedGameActor).moveTo(touchPoint);
-            }
         }
 
         return super.touchDown(screenX, screenY, pointer, button);
@@ -149,10 +137,11 @@ public class GameStage extends Stage implements QueryCallback {
 
     @Override
     public void act(float delta) {
-        super.act(delta);
+        if (!paused) {
+            super.act(delta);
 
         //  fixed time step
-        if (!paused) {
+
             accumulator += delta;
 
             while (accumulator >= delta) {
@@ -182,8 +171,8 @@ public class GameStage extends Stage implements QueryCallback {
 
     @Override
     public boolean reportFixture(Fixture fixture) {
+
         if (fixture.getBody() != null && fixture.getBody().getUserData() instanceof GameActor) {
-            Gdx.app.log("report fixture", fixture.getBody().getUserData().toString());
             setSelectedGameActor(((GameActor) fixture.getBody().getUserData()));
             uiStage.updateActionMenu();
         }
@@ -194,7 +183,7 @@ public class GameStage extends Stage implements QueryCallback {
         for (Actor actor : getActors()) {
             if (actor instanceof GameActor) {
                 uiStage.updateActionSet(((GameActor) actor));
-                uiStage.updateActionMenu();
+//                uiStage.updateActionMenu();
             }
         }
 

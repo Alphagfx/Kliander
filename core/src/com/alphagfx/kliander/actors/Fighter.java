@@ -1,12 +1,12 @@
 package com.alphagfx.kliander.actors;
 
 import com.alphagfx.kliander.utils.WorldUtils;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.MassData;
-import com.badlogic.gdx.physics.box2d.joints.WeldJointDef;
+import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
+import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
 import java.util.LinkedHashSet;
@@ -32,7 +32,7 @@ public class Fighter extends Creature {
         boolean action_performed = true;
         switch (action) {
             case "FIRE": {
-                fire();
+                fire(vector);
                 break;
             }
             default: {
@@ -47,8 +47,8 @@ public class Fighter extends Creature {
     }
 
     private Weapon weapon;
-
     private Vector2 target;
+    private RevoluteJoint revoluteJoint;
 
     public Fighter(Body body, Weapon weapon) {
         super(body);
@@ -57,8 +57,8 @@ public class Fighter extends Creature {
     }
 
     public Fighter(Body body) {
-        this(body, new Weapon(WorldUtils.createWeapon(body.getWorld(), body.getPosition().add(1.5f, -0.7f),
-                -MathUtils.PI / 2, 0.2f, 0.7f), new Vector2(0, 1.3f)));
+        this(body, new Weapon(WorldUtils.createBody(body.getWorld(), body.getPosition().add(1.5f, -0.7f),
+                0, 0.7f, 0.2f), new Vector2(1.3f, 0)));
     }
 
     public void addWeapon(Weapon weapon) {
@@ -75,11 +75,21 @@ public class Fighter extends Creature {
 
         setHealth(100);
 
-        WeldJointDef weldJointDef = new WeldJointDef();
-        weldJointDef.initialize(weapon.getBody(), body, weapon.getBody().getPosition());
-//        weldJointDef.dampingRatio = 0;
-//        weldJointDef.frequencyHz = 10;
-        body.getWorld().createJoint(weldJointDef);
+
+        RevoluteJointDef jointDef = new RevoluteJointDef();
+        jointDef.initialize(body, weapon.getBody(), body.getPosition());
+
+        jointDef.lowerAngle = -0.25f * MathUtils.PI; // -45 degrees
+        jointDef.upperAngle = 0.25f * MathUtils.PI; // 45 degrees
+
+        jointDef.enableLimit = true;
+        jointDef.enableMotor = true;
+
+        jointDef.maxMotorTorque = 10.0f;
+        jointDef.motorSpeed = 0.0f;
+
+        revoluteJoint = ((RevoluteJoint) body.getWorld().createJoint(jointDef));
+
 
         weapon.getBody().setMassData(new MassData() {
             {
@@ -99,17 +109,35 @@ public class Fighter extends Creature {
         }
     }
 
-    private void fire() {
-        weapon.fire(body.getAngle());
-//        Gdx.app.log("weapon", weapon == null ? "null" : "present");
+    private void fire(Vector2 vector) {
+
+        setTarget(vector);
+
+        if (WorldUtils.containsInFOV(body.getPosition(), vector, body.getAngle())) {
+            turnWeapon(vector);
+
+            weapon.fire(0);
+        }
     }
 
-    public void setTarget(Vector2 target) {
-        this.target = target;
+    private void turnWeapon(Vector2 vector) {
 
-        // FIXME: 11/1/17 remove later
-        if (target != null && WorldUtils.containsInFOV(body.getPosition(), target, WorldUtils.transformAngle(body.getAngle()))) {
-            Gdx.app.log("angle", "contains " + body.getPosition() + " : " + target);
+        float body_angle = WorldUtils.transformAngle(weapon.getBody().getAngle());
+        float targetAngle = WorldUtils.transformAngle(new Vector2(target).sub(weapon.getBody().getPosition()).nor().angleRad());
+
+        revoluteJoint.setMotorSpeed((((targetAngle - body_angle) + MathUtils.PI2) % MathUtils.PI2 > MathUtils.PI) ? -5 : 5);
+
+    }
+
+    private void setTarget(Vector2 target) {
+        this.target = target;
+    }
+
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+        if (target != null && Math.abs(WorldUtils.transformAngle(new Vector2(target).sub(weapon.getBody().getPosition()).angleRad()) - WorldUtils.transformAngle(weapon.getBody().getAngle())) <= 0.01) {
+            revoluteJoint.setMotorSpeed(0);
         }
     }
 
@@ -121,6 +149,6 @@ public class Fighter extends Creature {
 
     @Override
     public String toString() {
-        return "Fighter";
+        return "Fighter: \n angle: " + body.getAngle() + "\n weapon angle: " + weapon.getBody().getAngle();
     }
 }

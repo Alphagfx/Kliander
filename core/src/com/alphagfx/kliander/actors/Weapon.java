@@ -40,6 +40,7 @@ public class Weapon extends GameActor {
         }
         Bullet bullet = new Bullet(body.getWorld(), selectedBullet, body.getWorldPoint(shootPoint), body.getAngle());
 //        Gdx.app.log("weapon body", body == null ? "null" : "present");
+//        Gdx.app.log("weapon angle", "" + body.getAngle());
 
         bullets.addFirst(bullet);
 

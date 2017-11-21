@@ -1,15 +1,18 @@
 package com.alphagfx.kliander.stages;
 
 import com.alphagfx.kliander.actors.GameActor;
+import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.kotcrab.vis.ui.VisUI;
 
 import java.util.Hashtable;
+import java.util.Map;
 
 public class UIStage extends Stage {
 
@@ -17,13 +20,15 @@ public class UIStage extends Stage {
     private String selectedAction = "NULL";
 
     //    Because not null
-    private Hashtable<String, Actor> actionSet;
+    private Map<String, Actor> actionSet;
 
     String getSelectedAction() {
         return selectedAction;
     }
 
     private Table table;
+    private Table rightSide = new Table();
+    private Table leftSide = new Table();
 
     public UIStage(Viewport viewport, GameStage gameStage) {
         super(viewport);
@@ -65,8 +70,8 @@ public class UIStage extends Stage {
         table.add(topSide).expand(true, false).left();
         table.top().row();
 
-
-        setRightSide();
+        table.add(setScrollPaneSide(leftSide)).height(600).left();
+        table.add(setScrollPaneSide(rightSide)).height(600).left();
 
         table.row();
 
@@ -86,52 +91,29 @@ public class UIStage extends Stage {
 
 //        Gdx.app.log("table set", table.toString());
 
-
     }
 
-    private void setRightSide() {
-        Skin skin = VisUI.getSkin();
+    private ScrollPane setScrollPaneSide(final Table refSide) {
 
-        Table rightSide = new Table(skin);
-        rightSide.setDebug(true);
-        rightSide.setWidth(250);
-        rightSide.defaults().size(150, 50).pad(10);
-        table.add(rightSide).right();
+        refSide.setDebug(true);
+        refSide.setSkin(VisUI.getSkin());
+        refSide.defaults().size(150, 50).pad(10);
+        refSide.top();
 
+        return new ScrollPane(refSide, VisUI.getSkin());
     }
 
     private void setVisibleActionMenu() {
-        boolean state = table.getCells().get(1).getActor().isVisible();
-        Actor actor = table.getCells().get(1).getActor();
-        actor.setVisible(!state);
+        rightSide.setVisible(!rightSide.isVisible());
+        leftSide.setVisible(!leftSide.isVisible());
     }
 
     public void updateActionMenu() {
-        Table rightSide = ((Table) table.getCells().get(1).getActor());
+
         for (Cell cell : rightSide.getCells()) {
             cell.clearActor();
-//            System.out.println("clear");
         }
-/*        for (int i = rightSide.getCells().size-1; i > -1; i--) {
-            rightSide.getCells().removeIndex(i);
-        }
-        rightSide.invalidate();
-        rightSide.layout();
-        System.out.println(rightSide.toString());*/
 
-/*
-        Label label = new Label("Name:", VisUI.getSkin());
-        label.setAlignment(1);
-        TextField textField = new TextField("", VisUI.getSkin());
-        textField.setAlignment(1);
-        textField.clearListeners();
-        textField.setVisible(false);
-
-        rightSide.add(label);
-        rightSide.row();
-        rightSide.add(textField);
-        rightSide.row();
-        */
         int i = 0;
         for (String key : actionSet.keySet()) {
             if (gameStage.getSelectedGameActor().getActionSet().contains(key)) {
@@ -141,9 +123,30 @@ public class UIStage extends Stage {
         }
     }
 
-    public void updateActionSet(GameActor gameActor) {
+    private void updateLeftSide() {
 
-        Table rightSide = ((Table) table.getCells().get(1).getActor());
+        leftSide.clearChildren();
+
+        if (gameStage.getSelectedGameActor() == null) {
+            return;
+        }
+        for (Action action : gameStage.getSelectedGameActor().getActions()) {
+            if (action instanceof SequenceAction) {
+                for (Action action1 : ((SequenceAction) action).getActions()) {
+                    if (action1.getActor() != null) {
+                        leftSide.add(action1.toString());
+                        leftSide.row();
+                    }
+                }
+            } else {
+                leftSide.add(action.toString());
+                leftSide.row();
+            }
+        }
+
+    }
+
+    public void updateActionSet(GameActor gameActor) {
 
         for (String str : gameActor.getActionSet()) {
             actionSet.putIfAbsent(str, new TextButton(str, VisUI.getSkin()) {
@@ -164,8 +167,12 @@ public class UIStage extends Stage {
         while (actionSet.size() > rightSide.getCells().size) {
             rightSide.add();
             rightSide.row();
-//            System.out.println("add");
         }
     }
 
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+        updateLeftSide();
+    }
 }

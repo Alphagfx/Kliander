@@ -1,11 +1,15 @@
 TODO:
 
-fixme   world timestep || creature speed (+angular) so it would not miss waypoints
-
 fixme   weapon destroy
 fixme   random Fighter rotation
 
 check info about world timestep
+
+removeAction for uiStage
+
+Actor factory
+
+Remove code duplication with Creature TurnTo and Fighter TurnWeapon
 
 Game Turns
     energy
@@ -14,8 +18,10 @@ UI
     scene2d
         weapon -> Actor -> clickable -> menu for selection ( for example bullets )
 
+Melee weapon
+
 Player differentiate
-    ids
+    id's
     xml
 
     FOV
@@ -60,6 +66,8 @@ InputMultiplexer
 fixed   wrong body || weapon rotation on creation
 fixed   freaking camera viewport
 fixed   merge Fighter body and weapon body (createFixture) (nothing, this has no sense)
+fixed   camera movement
+fixed   world timestep || creature speed (+angular) so it would not miss waypoints
 
 
 
@@ -76,6 +84,9 @@ new Creature child
 World.QueryAABB
 Fixture select
         correct actor mouse hitbox with body
+
+character planned actions list
+
 
 
 

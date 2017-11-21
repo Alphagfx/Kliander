@@ -43,9 +43,9 @@ public class Bullet implements IBodyUserData {
         launch(angle);
     }
 
-    public void launch(float angle) {
+    private void launch(float angle) {
 
-        body.applyLinearImpulse(new Vector2(-MathUtils.sin(angle), MathUtils.cos(angle)).scl(speed), body.getWorldCenter(), true);
+        body.applyLinearImpulse(new Vector2(MathUtils.cos(angle), MathUtils.sin(angle)).scl(speed), body.getWorldCenter(), true);
     }
 
     @Override

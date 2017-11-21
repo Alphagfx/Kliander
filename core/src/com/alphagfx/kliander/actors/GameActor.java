@@ -4,10 +4,13 @@ import com.alphagfx.kliander.box2d.IBodyUserData;
 import com.alphagfx.kliander.enums.UserDataType;
 import com.alphagfx.kliander.utils.Constants;
 import com.alphagfx.kliander.utils.WorldUtils;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -34,6 +37,7 @@ public abstract class GameActor extends Actor implements IBodyUserData {
     static {
         actionSet = new LinkedHashSet<>();
 //        actionSet.add("GAME ACTOR");
+        actionSet.add("INFO");
     }
 
     public Set<String> getActionSet() {
@@ -41,7 +45,18 @@ public abstract class GameActor extends Actor implements IBodyUserData {
     }
 
     public boolean doGameAction(String action, Vector2 vector) {
-        return false;
+        boolean action_performed = true;
+        switch (action) {
+            case "INFO": {
+                Gdx.app.log("INFO", toString());
+                break;
+            }
+            default: {
+                action_performed = false;
+                break;
+            }
+        }
+        return action_performed;
     }
 
     public GameActor(Body body, float sizeX, float sizeY) {
@@ -54,12 +69,35 @@ public abstract class GameActor extends Actor implements IBodyUserData {
         setPosition(body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2);
         setRotation(WorldUtils.transformAngle(body.getAngle()) * MathUtils.radiansToDegrees);
 
+
     }
 
     public GameActor(Body body) {
 
         this(body, Constants.GAME_ACTOR_DEFAULT_SIZE_X, Constants.GAME_ACTOR_DEFAULT_SIZE_Y);
 
+    }
+
+    /**
+     * So now we have only sequential behavior of an actor
+     */
+
+    @Override
+    public void addAction(Action action) {
+
+        if (getActions().size == 0) {
+            super.addAction(new SequenceAction());
+        }
+        ((SequenceAction) getActions().get(0)).addAction(action);
+    }
+
+    // FIXME: 11/20/17 removeValue(action, IDENTITY) and check for null
+    @Override
+    public void removeAction(Action action) {
+
+        if (getActions().size != 0) {
+            ((SequenceAction) getActions().get(0)).getActions().removeValue(action, true);
+        }
     }
 
     @Override

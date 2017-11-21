@@ -14,24 +14,24 @@ public class WorldUtils {
         return new World(Constants.WORLD_GRAVITY, true);
     }
 
-    public static Body createSubj(World world, Vector2 vector2, float rotation) {
+    // FIXME: 11/4/17 add Weapon as actor to the GameStage
+    public static Body createBody(World world, Vector2 position, float angle, float width, float height) {
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set((vector2 != null) ? vector2 : new Vector2(0, 0));
-        bodyDef.angle = rotation;
+        bodyDef.position.set(position);
+        bodyDef.angle = angle;
 
-        //  fix me
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(0.6f, 1.5f);
+        shape.setAsBox(width, height);
 
         Body body = world.createBody(bodyDef);
-        body.createFixture(shape, 0.5f);
-        body.resetMassData();
+        body.createFixture(shape, 1f);
 
         shape.dispose();
 
         return body;
+
     }
 
     public static Body createObstacle(World world, Vector2 vector2) {
@@ -93,32 +93,28 @@ public class WorldUtils {
 
     }
 
-    // FIXME: 11/4/17 add Weapon as actor to the GameStage
-    public static Body createWeapon(World world, Vector2 position, float angle, float width, float height) {
-
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(position);
-
-        PolygonShape shape = new PolygonShape();
-        shape.setAsBox(width, height);
-
-        Body body = world.createBody(bodyDef);
-        body.createFixture(shape, 1f);
-        body.setTransform(position, angle);
-
-        shape.dispose();
-
-        return body;
-
-    }
-
     //    Transforms angle in bounds between 0 and 2*PI
     public static float transformAngle(float angle) {
         return ((angle % MathUtils.PI2 + MathUtils.PI2)) % MathUtils.PI2;
     }
 
+
+    /**
+     * Default for Fighter
+     */
     public static boolean containsInFOV(Vector2 start, Vector2 end, float startAngle) {
+        return containsInFOV(start, end, startAngle, MathUtils.PI / 4);
+    }
+
+    /**
+     * Contains if FOV
+     *
+     * @param start      owner body position
+     * @param end        target body position
+     * @param startAngle owner body orientation
+     * @param fov        width of FOV
+     */
+    public static boolean containsInFOV(Vector2 start, Vector2 end, float startAngle, float fov) {
 
         Vector2 ownerOrientation =
                 new Vector2((float) Math.cos(startAngle), (float) Math.sin(startAngle));
@@ -126,9 +122,8 @@ public class WorldUtils {
 
         float product = ownerOrientation.nor().dot(targetOffset.nor());
         float checkAngle = (float) Math.acos(product);
-        float FIELD_OF_VIEW_ANGLE = MathUtils.PI / 4;
 
-        return checkAngle < FIELD_OF_VIEW_ANGLE;
+        return checkAngle < fov;
     }
 
     public static void checkDeadBodies(World world) {
@@ -145,12 +140,6 @@ public class WorldUtils {
                 ((IBodyUserData) body.getUserData()).destroyBodyUser();
 
         }
-    }
-
-    //    Basic Circle contains, used instead of a Shape2D
-//    Preferred to use Body Fixtures
-    public static boolean containsInCircle(Vector2 touch, Vector2 body, int r) {
-        return ((touch.x - body.x) * (touch.x - body.x) + (touch.y - body.y) * (touch.y - body.y)) < (r * r);
     }
 
 }

@@ -18,4 +18,10 @@ public class Constants {
     public final static float GAME_ACTOR_DEFAULT_SIZE_X = 2;
     public final static float GAME_ACTOR_DEFAULT_SIZE_Y = 2;
 
+    /**
+     * Default duration of one game turn in seconds
+     */
+    public final static float GAME_TURN_DURATION = 10;
+
+
 }

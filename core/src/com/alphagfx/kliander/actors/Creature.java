@@ -16,7 +16,6 @@ package com.alphagfx.kliander.actors;
 
 import com.alphagfx.kliander.enums.UserDataType;
 import com.alphagfx.kliander.utils.WorldUtils;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -61,7 +60,7 @@ public class Creature extends GameActor {
                 break;
             }
             default: {
-                action_performed = false;
+                action_performed = super.doGameAction(action, vector);
             }
         }
 
@@ -85,7 +84,7 @@ public class Creature extends GameActor {
         return body;
     }
 
-    public void stop() {
+    private void stop() {
         body.setLinearVelocity(0, 0);
     }
 
@@ -104,7 +103,7 @@ public class Creature extends GameActor {
         turnTo(angle);
     }
 
-    public void moveTo(Vector2 position) {
+    private void moveTo(Vector2 position) {
 
         waypoint = position;
 
@@ -114,7 +113,7 @@ public class Creature extends GameActor {
 
     }
 
-    public void turnTo(float angle) {
+    private void turnTo(float angle) {
 
         float body_angle = WorldUtils.transformAngle(body.getAngle());
 
@@ -126,24 +125,14 @@ public class Creature extends GameActor {
 
     }
 
-    public void getActorPosition() {
-
-        Gdx.app.log("angle", "" + waypoint_angle);
-        Gdx.app.log("body angle", "" + ((body.getAngle() % MathUtils.PI2 + MathUtils.PI2)) % MathUtils.PI2);
-        Gdx.app.log("speed", "" + body.getLinearVelocity());
-
-    }
-
     /**
      * Updates actor position relative to body position
      * Compares body position and rotation and stops if needed
-     *
-     * @param delta
      */
 
     @Override
     public void act(float delta) {
-
+        super.act(delta);
         if (body.isAwake()) {
 
             setPosition(body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2);

@@ -28,7 +28,6 @@ public class CameraHandle extends ExtendViewport {
 
     public class CameraInput extends InputAdapter {
 
-        private boolean camera_read;
 
         private void handleInput() {
             if (Gdx.input.isKeyPressed(Input.Keys.NUM_9)) {
@@ -75,25 +74,9 @@ public class CameraHandle extends ExtendViewport {
 
         public void act() {
 
-            if (camera_read) {
+            if (Gdx.input.isKeyPressed(-1)) {
                 handleInput();
             }
-        }
-
-        @Override
-        public boolean keyDown(int keycode) {
-
-            camera_read = true;
-
-            return true;
-        }
-
-        @Override
-        public boolean keyUp(int keycode) {
-
-            camera_read = false;
-
-            return true;
         }
 
         @Override
