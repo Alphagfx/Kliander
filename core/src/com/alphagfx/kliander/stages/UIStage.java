@@ -89,8 +89,6 @@ public class UIStage extends Stage {
         textButton.getLabel().setAlignment(1, 1);
         topSide.add(textButton);
 
-//        Gdx.app.log("table set", table.toString());
-
     }
 
     private ScrollPane setScrollPaneSide(final Table refSide) {
@@ -108,10 +106,14 @@ public class UIStage extends Stage {
         leftSide.setVisible(!leftSide.isVisible());
     }
 
-    public void updateActionMenu() {
+    void updateActionMenu() {
 
         for (Cell cell : rightSide.getCells()) {
             cell.clearActor();
+        }
+
+        if (gameStage.getSelectedGameActor() == null) {
+            return;
         }
 
         int i = 0;
@@ -146,7 +148,7 @@ public class UIStage extends Stage {
 
     }
 
-    public void updateActionSet(GameActor gameActor) {
+    void updateActionSet(GameActor gameActor) {
 
         for (String str : gameActor.getActionSet()) {
             actionSet.putIfAbsent(str, new TextButton(str, VisUI.getSkin()) {

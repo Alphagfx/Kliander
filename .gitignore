@@ -162,3 +162,5 @@ editor.xml
 filetypes.xml
 ui.lnf.xml
 find.xml
+plugin_ui.xml
+vcs.xml

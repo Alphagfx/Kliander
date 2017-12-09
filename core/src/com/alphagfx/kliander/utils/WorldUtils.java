@@ -34,14 +34,14 @@ public class WorldUtils {
 
     }
 
-    public static Body createObstacle(World world, Vector2 vector2) {
+    public static Body createObstacle(World world, Vector2 position, float x, float y) {
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.StaticBody;
-        bodyDef.position.set((vector2 != null) ? vector2 : new Vector2(0, 0));
+        bodyDef.position.set(position);
 
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(1, 1);
+        shape.setAsBox(x, y);
 
         Body body = world.createBody(bodyDef);
         body.createFixture(shape, 0f);

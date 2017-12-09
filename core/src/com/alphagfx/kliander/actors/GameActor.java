@@ -1,8 +1,8 @@
 package com.alphagfx.kliander.actors;
 
+import com.alphagfx.kliander.actors.actions.GameAction;
 import com.alphagfx.kliander.box2d.IBodyUserData;
 import com.alphagfx.kliander.enums.UserDataType;
-import com.alphagfx.kliander.utils.Constants;
 import com.alphagfx.kliander.utils.WorldUtils;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 
+import java.util.Hashtable;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -24,6 +25,20 @@ public abstract class GameActor extends Actor implements IBodyUserData {
     private float health = 100;
     private boolean invincible;
 
+    private static Hashtable<String, Factory<? extends GameActor>> gameFactory = new Hashtable<>();
+
+    public static Factory<? extends GameActor> getFactory(String key) {
+        return gameFactory.get(key);
+    }
+
+    public static Factory<? extends GameActor> addFactory(String key, Factory<? extends GameActor> factory) {
+        return gameFactory.putIfAbsent(key, factory);
+    }
+
+    public static Set<String> getFactoryKeys() {
+        return gameFactory.keySet();
+    }
+
     /**
      * HOW TO ADD to Action Set
      * add new protected action set
@@ -31,35 +46,41 @@ public abstract class GameActor extends Actor implements IBodyUserData {
      * override static constructor with new action Set and add new actions
      * override doGameAction
      */
-
     protected static Set<String> actionSet;
 
     static {
         actionSet = new LinkedHashSet<>();
-//        actionSet.add("GAME ACTOR");
         actionSet.add("INFO");
+
+        GameActor.addFactory("Creature", new Creature.Factory());
+        GameActor.addFactory("Obstacle", new Obstacle.Factory());
+        GameActor.addFactory("Fighter", new Fighter.Factory());
     }
 
     public Set<String> getActionSet() {
         return actionSet;
     }
 
-    public boolean doGameAction(String action, Vector2 vector) {
-        boolean action_performed = true;
-        switch (action) {
+    public <T> Action doGameAction(String actionName, T target) {
+
+        switch (actionName) {
             case "INFO": {
-                Gdx.app.log("INFO", toString());
-                break;
+                return new GameAction("Info", target) {
+
+                    @Override
+                    public boolean act(float delta) {
+                        Gdx.app.log("INFO", target.toString());
+                        return true;
+                    }
+                };
             }
             default: {
-                action_performed = false;
-                break;
+                return null;
             }
         }
-        return action_performed;
     }
 
-    public GameActor(Body body, float sizeX, float sizeY) {
+    protected GameActor(Body body, float sizeX, float sizeY) {
 
         setBody(body);
 
@@ -72,16 +93,24 @@ public abstract class GameActor extends Actor implements IBodyUserData {
 
     }
 
-    public GameActor(Body body) {
+    protected GameActor(Body body) {
 
-        this(body, Constants.GAME_ACTOR_DEFAULT_SIZE_X, Constants.GAME_ACTOR_DEFAULT_SIZE_Y);
+        if (body != null)
+            setBody(body);
 
     }
+
+    protected abstract void moveTo(Vector2 target);
+
+    protected abstract void turnTo(float angle);
+
+    protected abstract void fire(Vector2 target);
+
+    protected abstract void specialAction(String name, Object... objects);
 
     /**
      * So now we have only sequential behavior of an actor
      */
-
     @Override
     public void addAction(Action action) {
 
@@ -158,6 +187,6 @@ public abstract class GameActor extends Actor implements IBodyUserData {
 
     @Override
     public String toString() {
-        return "GameActor : " + (isDead ? "dead" : "alive") + "   DataType : " + userDataType;
+        return "GameActor : " + userDataType + " :" + (isDead ? "dead" : "alive");
     }
 }

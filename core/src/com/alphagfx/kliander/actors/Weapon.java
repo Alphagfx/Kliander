@@ -23,7 +23,7 @@ public class Weapon extends GameActor {
     private int ammo = 10;
     private float range;
 
-    public Weapon(Body body, Vector2 shootPoint) {
+    Weapon(Body body, Vector2 shootPoint) {
 
         super(body, 1, 1);
 
@@ -34,7 +34,18 @@ public class Weapon extends GameActor {
         this.shootPoint = shootPoint;
     }
 
-    public void fire(float angle) {
+    @Override
+    protected void moveTo(Vector2 target) {
+
+    }
+
+    @Override
+    protected void turnTo(float angle) {
+
+    }
+
+    @Override
+    protected void fire(Vector2 target) {
         if (isDead()) {
             return;
         }
@@ -47,6 +58,12 @@ public class Weapon extends GameActor {
         if (bullets.size() > ammo) {
             bullets.removeLast().setDead(true);
         }
+
+    }
+
+    @Override
+    protected void specialAction(String name, Object... objects) {
+        //Place for reload action or switch bullets
 
     }
 

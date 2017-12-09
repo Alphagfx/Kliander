@@ -1,12 +1,15 @@
 package com.alphagfx.kliander.actors;
 
+import com.alphagfx.kliander.actors.actions.GameAction;
 import com.alphagfx.kliander.utils.WorldUtils;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.MassData;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
+import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
 import java.util.LinkedHashSet;
@@ -17,8 +20,7 @@ public class Fighter extends Creature {
     protected static Set<String> actionSet;
 
     static {
-        actionSet = new LinkedHashSet<>();
-        actionSet.addAll(Creature.actionSet);
+        actionSet = new LinkedHashSet<>(Creature.actionSet);
         actionSet.add("FIRE");
     }
 
@@ -28,22 +30,26 @@ public class Fighter extends Creature {
     }
 
     @Override
-    public boolean doGameAction(String action, Vector2 vector) {
-        boolean action_performed = true;
+    public <T> Action doGameAction(String action, T target) {
+
         switch (action) {
             case "FIRE": {
-                fire(vector);
-                break;
+                return new GameAction("Fire", target) {
+                    {
+                        setName("Fire");
+                    }
+
+                    @Override
+                    public boolean act(float delta) {
+                        ((GameActor) target).fire(getPosition());
+                        return true;
+                    }
+                };
             }
             default: {
-                action_performed = false;
-                break;
+                return super.doGameAction(action, target);
             }
         }
-        if (!action_performed) {
-            action_performed = super.doGameAction(action, vector);
-        }
-        return action_performed;
     }
 
     private Weapon weapon;
@@ -109,18 +115,19 @@ public class Fighter extends Creature {
         }
     }
 
-    private void fire(Vector2 vector) {
+    @Override
+    protected void fire(Vector2 target) {
 
-        setTarget(vector);
+        setTarget(target);
 
-        if (WorldUtils.containsInFOV(body.getPosition(), vector, body.getAngle())) {
-            turnWeapon(vector);
+        if (WorldUtils.containsInFOV(body.getPosition(), target, body.getAngle())) {
+            turnWeapon();
 
-            weapon.fire(0);
+            weapon.fire(target);
         }
     }
 
-    private void turnWeapon(Vector2 vector) {
+    private void turnWeapon() {
 
         float body_angle = WorldUtils.transformAngle(weapon.getBody().getAngle());
         float targetAngle = WorldUtils.transformAngle(new Vector2(target).sub(weapon.getBody().getPosition()).nor().angleRad());
@@ -150,5 +157,12 @@ public class Fighter extends Creature {
     @Override
     public String toString() {
         return "Fighter: \n angle: " + body.getAngle() + "\n weapon angle: " + weapon.getBody().getAngle();
+    }
+
+    public static class Factory implements com.alphagfx.kliander.actors.Factory<Fighter> {
+        @Override
+        public Fighter create(World world, Vector2 position, float angle, Object... objects) {
+            return new Fighter(WorldUtils.createBody(world, position, 0, 0.6f, 1.5f));
+        }
     }
 }

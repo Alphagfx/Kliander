@@ -15,16 +15,50 @@
 package com.alphagfx.kliander.actors;
 
 import com.alphagfx.kliander.enums.UserDataType;
+import com.alphagfx.kliander.utils.WorldUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.World;
 
 public class Obstacle extends GameActor {
 
-    public Obstacle(Body body, float sizeX, float sizeY) {
-        super(body, sizeX, sizeY);
+    public Obstacle(Body body) {
+        super(body);
 
         setUserDataType(UserDataType.OBSTACLE);
 
         setInvincible(true);
+    }
+
+    @Override
+    protected void moveTo(Vector2 target) {
+
+    }
+
+    @Override
+    protected void turnTo(float angle) {
+
+    }
+
+    @Override
+    protected void fire(Vector2 target) {
+
+    }
+
+    @Override
+    protected void specialAction(String name, Object... objects) {
+
+    }
+
+    public static class Factory implements com.alphagfx.kliander.actors.Factory<Obstacle> {
+        @Override
+        public Obstacle create(World world, Vector2 position, float angle, Object... objects) {
+            if (objects.length == 2 && objects instanceof Float[]) {
+                return new Obstacle(WorldUtils.createObstacle(world, position, ((float) objects[0]), ((float) objects[1])));
+            } else {
+                return new Obstacle(WorldUtils.createObstacle(world, position, 1, 1));
+            }
+        }
     }
 
 }
