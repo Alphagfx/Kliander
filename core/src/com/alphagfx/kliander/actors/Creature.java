@@ -31,7 +31,7 @@ import java.util.Set;
 
 public class Creature extends GameActor {
 
-    protected static Set<String> actionSet;
+    static Set<String> actionSet;
 
     static {
         actionSet = new LinkedHashSet<>(GameActor.actionSet);
@@ -48,13 +48,20 @@ public class Creature extends GameActor {
 
         switch (action) {
             case "MOVE": {
-                RepeatAction repeatAction = new RepeatAction();
-                repeatAction.setAction(new GameAction("Move", target) {
+                RepeatAction repeatAction = new RepeatAction() {
                     @Override
-                    public boolean act(float delta) {
+                    public String toString() {
+                        return action.toString();
+                    }
+                };
+                repeatAction.setAction(new GameAction("Move", target) {
+
+                    @Override
+                    public boolean doAction() {
                         if (body.getPosition().epsilonEquals(getPosition(), 0.05f)) {
                             stop();
                             repeatAction.finish();
+                            repeatAction.setActor(null);
                             return true;
                         }
                         ((GameActor) target).moveTo(getPosition());
@@ -65,10 +72,15 @@ public class Creature extends GameActor {
                 return repeatAction;
             }
             case "TURN": {
-                RepeatAction repeatAction = new RepeatAction();
+                RepeatAction repeatAction = new RepeatAction() {
+                    @Override
+                    public String toString() {
+                        return action.toString();
+                    }
+                };
                 repeatAction.setAction(new GameAction("Turn", target) {
                     @Override
-                    public boolean act(float delta) {
+                    public boolean doAction() {
 
                         Vector2 vector2 = body.getPosition().sub(getPosition()).nor();
                         float angle = MathUtils.atan2(vector2.y, vector2.x) + MathUtils.PI;
@@ -76,6 +88,7 @@ public class Creature extends GameActor {
                         if (Math.abs(angle - WorldUtils.transformAngle(body.getAngle())) <= 0.05) {
                             body.setAngularVelocity(0);
                             repeatAction.finish();
+                            repeatAction.setActor(null);
                             return true;
                         }
                         turnTo(angle);

@@ -1,15 +1,17 @@
 TODO:
 
 fixme   weapon destroy
-fixme   random Fighter rotation
+fixme   file error log
 
 check info about world timestep
 
-removeAction for uiStage
-
-Actor factory
-
 Remove code duplication with Creature TurnTo and Fighter TurnWeapon
+
+Save'n'load system
+    Serializable for GameActors
+    xml or json for maps(predefined set of objects changeable for human)
+    configs(Preferences(preferred) vs XML vs JSON)
+
 
 Game Turns
     energy
@@ -37,11 +39,7 @@ Player differentiate
 
 isSensor
 
-Custom bodies
-
 fixme ui resize
-
-?(Serializable)
 
 multiple creature select
 
@@ -68,8 +66,7 @@ fixed   freaking camera viewport
 fixed   merge Fighter body and weapon body (createFixture) (nothing, this has no sense)
 fixed   camera movement
 fixed   world timestep || creature speed (+angular) so it would not miss waypoints
-
-
+fixed   random Fighter rotation
 
 new Game Screens
 
@@ -86,6 +83,9 @@ Fixture select
         correct actor mouse hitbox with body
 
 character planned actions list
+removeAction for uiStage
+Actor factory
+Custom bodies
 
 
 

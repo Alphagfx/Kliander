@@ -53,7 +53,7 @@ public class Obstacle extends GameActor {
     public static class Factory implements com.alphagfx.kliander.actors.Factory<Obstacle> {
         @Override
         public Obstacle create(World world, Vector2 position, float angle, Object... objects) {
-            if (objects.length == 2 && objects instanceof Float[]) {
+            if (objects.length == 2 && objects[0] instanceof Float && objects[1] instanceof Float) {
                 return new Obstacle(WorldUtils.createObstacle(world, position, ((float) objects[0]), ((float) objects[1])));
             } else {
                 return new Obstacle(WorldUtils.createObstacle(world, position, 1, 1));

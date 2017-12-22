@@ -10,7 +10,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.actions.ParallelAction;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
+import com.badlogic.gdx.utils.Array;
 
 import java.util.Hashtable;
 import java.util.LinkedHashSet;
@@ -18,7 +20,7 @@ import java.util.Set;
 
 public abstract class GameActor extends Actor implements IBodyUserData {
 
-    protected Body body;
+    Body body;
     private UserDataType userDataType = UserDataType.UNKNOWN;
     private boolean isDead;
 
@@ -31,8 +33,8 @@ public abstract class GameActor extends Actor implements IBodyUserData {
         return gameFactory.get(key);
     }
 
-    public static Factory<? extends GameActor> addFactory(String key, Factory<? extends GameActor> factory) {
-        return gameFactory.putIfAbsent(key, factory);
+    public static void addFactory(String key, Factory<? extends GameActor> factory) {
+        gameFactory.putIfAbsent(key, factory);
     }
 
     public static Set<String> getFactoryKeys() {
@@ -46,7 +48,7 @@ public abstract class GameActor extends Actor implements IBodyUserData {
      * override static constructor with new action Set and add new actions
      * override doGameAction
      */
-    protected static Set<String> actionSet;
+    static Set<String> actionSet;
 
     static {
         actionSet = new LinkedHashSet<>();
@@ -68,8 +70,9 @@ public abstract class GameActor extends Actor implements IBodyUserData {
                 return new GameAction("Info", target) {
 
                     @Override
-                    public boolean act(float delta) {
+                    public boolean doAction() {
                         Gdx.app.log("INFO", target.toString());
+                        setActor(null);
                         return true;
                     }
                 };
@@ -115,18 +118,50 @@ public abstract class GameActor extends Actor implements IBodyUserData {
     public void addAction(Action action) {
 
         if (getActions().size == 0) {
-            super.addAction(new SequenceAction());
+            super.addAction(new SequenceAction() {
+                @Override
+                public String toString() {
+                    return "(Main Sequence)\nDelete all";
+                }
+            });
         }
         ((SequenceAction) getActions().get(0)).addAction(action);
     }
 
-    // FIXME: 11/20/17 removeValue(action, IDENTITY) and check for null
     @Override
     public void removeAction(Action action) {
+        removeActionInParallel(getActions(), action);
+    }
 
-        if (getActions().size != 0) {
-            ((SequenceAction) getActions().get(0)).getActions().removeValue(action, true);
+    private void removeActionInParallel(Array<Action> source, Action removeAction) {
+
+        if (source.removeValue(removeAction, true)) {
+            removeAction.setActor(null);
+        } else {
+            for (Action action : source) {
+                if (action instanceof ParallelAction) {
+                    removeActionInParallel(((ParallelAction) action).getActions(), removeAction);
+                }
+            }
         }
+
+    }
+
+    public Array<Action> listActions() {
+        return listActions(this.getActions());
+    }
+
+    public Array<Action> listActions(Array<Action> actionArray) {
+        Array<Action> actions = new Array<>();
+        for (int i = 0; i < actionArray.size; i++) {
+            if (actionArray.get(i).getActor() != null) {
+                actions.add(actionArray.get(i));
+                if (actionArray.get(i) instanceof ParallelAction) {
+                    actions.addAll(listActions(((ParallelAction) actionArray.get(i)).getActions()));
+                }
+            }
+        }
+        return actions;
     }
 
     @Override

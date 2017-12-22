@@ -1,6 +1,7 @@
 package com.alphagfx.kliander.stages;
 
 import com.alphagfx.kliander.actors.Bullet;
+import com.alphagfx.kliander.actors.Factory;
 import com.alphagfx.kliander.actors.GameActor;
 import com.alphagfx.kliander.box2d.IBodyUserData;
 import com.alphagfx.kliander.utils.CameraHandle;
@@ -50,7 +51,6 @@ public class GameStage extends Stage implements QueryCallback {
 
         for (int i = 0; i < 5; i++) {
             float angle = MathUtils.random(MathUtils.PI2);
-            angle = 0;
             addGameActor("Fighter", new Vector2((float) Math.random() * 90 + 5, (float) Math.random() * 90 + 5), angle);
             addGameActor("Obstacle", new Vector2((float) Math.random() * 90 + 5, (float) Math.random() * 90 + 5), angle);
         }
@@ -96,12 +96,21 @@ public class GameStage extends Stage implements QueryCallback {
     }
 
     private void addGameActor(String name, Vector2 position, float angle) {
-        GameActor gameActor = GameActor.getFactory(name).create(world, position, angle);
-        addActor(gameActor);
+        Factory<? extends GameActor> factory = GameActor.getFactory(name);
+        try {
+            GameActor gameActor = factory.create(world, position, angle);
+            addActor(gameActor);
+        } catch (NullPointerException e) {
+            throw new RuntimeException("No such factory", e);
+        }
     }
 
     void setUiStage(UIStage uiStage) {
         this.uiStage = uiStage;
+    }
+
+    public UIStage getUiStage() {
+        return uiStage;
     }
 
     public void setSelectedGameActor(GameActor selectedGameActor) {
@@ -130,6 +139,7 @@ public class GameStage extends Stage implements QueryCallback {
             Action action = selectedGameActor.doGameAction(uiStage.getSelectedAction(), returnedActor != null ? returnedActor : touchPoint);
             if (action != null) {
                 selectedGameActor.addAction(action);
+                getUiStage().updateLeftSide();
             }
         }
 
@@ -142,7 +152,6 @@ public class GameStage extends Stage implements QueryCallback {
     public void act(float delta) {
         if (!paused) {
             super.act(delta);
-
         //  fixed time step
             accumulator += delta;
 
@@ -151,7 +160,6 @@ public class GameStage extends Stage implements QueryCallback {
                 accumulator -= delta;
             }
         }
-
         WorldUtils.checkDeadBodies(world);
     }
 

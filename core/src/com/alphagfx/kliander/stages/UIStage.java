@@ -5,9 +5,9 @@ import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.kotcrab.vis.ui.VisUI;
 
@@ -19,7 +19,8 @@ public class UIStage extends Stage {
     private GameStage gameStage;
     private String selectedAction = "NULL";
 
-    //    Because not null
+    private Skin skin = VisUI.getSkin();
+
     private Map<String, Actor> actionSet;
 
     String getSelectedAction() {
@@ -39,8 +40,6 @@ public class UIStage extends Stage {
     }
 
     private void create() {
-        Skin skin = VisUI.getSkin();
-
 
         table = new Table(skin);
         table.setFillParent(true);
@@ -64,15 +63,12 @@ public class UIStage extends Stage {
                 });
             }
         });
-
         topSide.left();
-
         table.add(topSide).expand(true, false).left();
         table.top().row();
 
         table.add(setScrollPaneSide(leftSide)).height(600).left();
-        table.add(setScrollPaneSide(rightSide)).height(600).left();
-
+        table.add(setScrollPaneSide(rightSide)).height(600);
         table.row();
 
         TextButton textButton = new TextButton("play", skin) {
@@ -85,20 +81,18 @@ public class UIStage extends Stage {
                 });
             }
         };
-
         textButton.getLabel().setAlignment(1, 1);
         topSide.add(textButton);
-
     }
 
-    private ScrollPane setScrollPaneSide(final Table refSide) {
+    private ScrollPane setScrollPaneSide(Table refSide) {
 
         refSide.setDebug(true);
-        refSide.setSkin(VisUI.getSkin());
+        refSide.setSkin(skin);
         refSide.defaults().size(150, 50).pad(10);
         refSide.top();
 
-        return new ScrollPane(refSide, VisUI.getSkin());
+        return new ScrollPane(refSide, skin);
     }
 
     private void setVisibleActionMenu() {
@@ -123,27 +117,62 @@ public class UIStage extends Stage {
                 i++;
             }
         }
+        updateLeftSide();
     }
 
-    private void updateLeftSide() {
+    private Pool<TextButton> textButtonPool = new Pool<TextButton>(4, 20) {
+        @Override
+        protected TextButton newObject() {
+            return new TextButton("empty", skin) {
+                Actor actor = null;
+                Action action = null;
 
+                {
+                    addListener(new ClickListener() {
+                        @Override
+                        public void clicked(InputEvent event, float x, float y) {
+                            actor.removeAction(action);
+                            action = null;
+                            actor = null;
+                            updateLeftSide();
+                        }
+                    });
+                }
+
+                @Override
+                public void setUserObject(Object userObject) {
+                    try {
+                        Object[] objects = ((Object[]) userObject);
+                        actor = ((Actor) objects[0]);
+                        action = ((Action) objects[1]);
+                    } catch (ClassCastException e) {
+                        // FIXME: 12/22/17 print to file log
+                        e.printStackTrace();
+                    }
+                }
+
+            };
+        }
+    };
+
+    public void updateLeftSide() {
+
+        for (Cell cell : leftSide.getCells()) {
+            textButtonPool.free((TextButton) cell.getActor());
+
+        }
         leftSide.clearChildren();
 
         if (gameStage.getSelectedGameActor() == null) {
             return;
         }
-        for (Action action : gameStage.getSelectedGameActor().getActions()) {
-            if (action instanceof SequenceAction) {
-                for (Action action1 : ((SequenceAction) action).getActions()) {
-                    if (action1.getActor() != null) {
-                        leftSide.add(action1.toString());
-                        leftSide.row();
-                    }
-                }
-            } else {
-                leftSide.add(action.toString());
-                leftSide.row();
-            }
+
+        for (Action action : gameStage.getSelectedGameActor().listActions()) {
+            TextButton textButton = textButtonPool.obtain();
+            textButton.setText(action.toString());
+            textButton.setUserObject(new Object[]{gameStage.getSelectedGameActor(), action});
+            leftSide.add(textButton);
+            leftSide.row();
         }
 
     }
@@ -151,14 +180,13 @@ public class UIStage extends Stage {
     void updateActionSet(GameActor gameActor) {
 
         for (String str : gameActor.getActionSet()) {
-            actionSet.putIfAbsent(str, new TextButton(str, VisUI.getSkin()) {
+            actionSet.putIfAbsent(str, new TextButton(str, skin) {
                 private String action = str;
 
                 {
                     addListener(new ClickListener() {
                         @Override
                         public void clicked(InputEvent event, float x, float y) {
-                            super.clicked(event, x, y);
                             selectedAction = action;
                         }
                     });
@@ -172,9 +200,4 @@ public class UIStage extends Stage {
         }
     }
 
-    @Override
-    public void act(float delta) {
-        super.act(delta);
-        updateLeftSide();
-    }
 }

@@ -17,7 +17,7 @@ import java.util.Set;
 
 public class Fighter extends Creature {
 
-    protected static Set<String> actionSet;
+    static Set<String> actionSet;
 
     static {
         actionSet = new LinkedHashSet<>(Creature.actionSet);
@@ -40,8 +40,9 @@ public class Fighter extends Creature {
                     }
 
                     @Override
-                    public boolean act(float delta) {
+                    public boolean doAction() {
                         ((GameActor) target).fire(getPosition());
+                        setActor(null);
                         return true;
                     }
                 };
@@ -63,8 +64,8 @@ public class Fighter extends Creature {
     }
 
     public Fighter(Body body) {
-        this(body, new Weapon(WorldUtils.createBody(body.getWorld(), body.getPosition().add(1.5f, -0.7f),
-                0, 0.7f, 0.2f), new Vector2(1.3f, 0)));
+        this(body, new Weapon(WorldUtils.createBody(body.getWorld(), body.getWorldPoint(new Vector2(1.5f, -0.7f)),
+                body.getAngle(), 0.7f, 0.2f), new Vector2(1.3f, 0)));
     }
 
     public void addWeapon(Weapon weapon) {
@@ -162,7 +163,7 @@ public class Fighter extends Creature {
     public static class Factory implements com.alphagfx.kliander.actors.Factory<Fighter> {
         @Override
         public Fighter create(World world, Vector2 position, float angle, Object... objects) {
-            return new Fighter(WorldUtils.createBody(world, position, 0, 0.6f, 1.5f));
+            return new Fighter(WorldUtils.createBody(world, position, angle, 0.6f, 1.5f));
         }
     }
 }
