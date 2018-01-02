@@ -1,0 +1,10 @@
+<templateSet group="iterations">
+  <template name="fore" value="for($item$ : $iterable$) {&#10;    $cursor$&#10;}" description="Create a for each loop" toReformat="false" toShortenFQNames="true">
+    <variable name="item" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="iterable" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="cursor" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="JAVA_STATEMENT" value="true" />
+    </context>
+  </template>
+</templateSet>
